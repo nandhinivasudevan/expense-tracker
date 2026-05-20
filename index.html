@@ -7,50 +7,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0e0c1a; --surface:#16132b; --surface2:#1e1a36; --border:#2e2a50;
-  --nandh:#f5a3c7; --nandh-dark:#c0527e; --nandh-glow:rgba(245,163,199,0.15);
-  --sri:#93d8f5; --sri-dark:#2d8cb5; --sri-glow:rgba(147,216,245,0.15);
-  --gold:#f7d070; --text:#e8e4f5; --muted:#7a748a;
-  --green:#6ae6a4; --red:#f57a7a; --radius:16px;
+  --bg:#f5f0eb; --surface:#ffffff; --surface2:#f0ebe4; --border:#e0d8cf;
+  --nandh:#c0527e; --nandh-dark:#96305a; --nandh-glow:rgba(192,82,126,0.10);
+  --sri:#2a7fa8; --sri-dark:#1a5f82; --sri-glow:rgba(42,127,168,0.10);
+  --gold:#d4730a; --text:#2c2117; --muted:#8a7968;
+  --green:#1e8a5e; --red:#c0392b; --radius:16px;
 }
-/* Dashboard colour theme — warm teal/amber/coral */
+/* Dashboard colour theme — inherits page theme */
 :root {
-  --dash-bg: #0d1a1a;
-  --dash-surface: #122020;
-  --dash-surface2: #1a2e2e;
-  --dash-border: #1f3d3d;
-  --dash-teal: #4ecdc4;
-  --dash-amber: #f9c74f;
-  --dash-coral: #f4845f;
-  --dash-mint: #95e1d3;
-  --dash-lavender: #c9b8ff;
-  --dash-n: #f9c74f;      /* Nandhini = amber */
-  --dash-s: #4ecdc4;      /* Srinivasan = teal */
-  --dash-n-glow: rgba(249,199,79,0.15);
-  --dash-s-glow: rgba(78,205,196,0.15);
+  --dash-bg: var(--bg);
+  --dash-surface: var(--surface);
+  --dash-surface2: var(--surface2);
+  --dash-border: var(--border);
+  --dash-teal: var(--sri);
+  --dash-amber: var(--gold);
+  --dash-coral: var(--nandh);
+  --dash-mint: var(--green);
+  --dash-lavender: #7c5cbf;
+  --dash-n: var(--nandh);
+  --dash-s: var(--sri);
+  --dash-n-glow: var(--nandh-glow);
+  --dash-s-glow: var(--sri-glow);
 }
-#panel-dashboard { background: transparent; }
-#panel-dashboard .scorecard { background: var(--dash-surface); border-color: var(--dash-border); }
-#panel-dashboard .scorecard.card-n  { border-top-color: var(--dash-n); }
-#panel-dashboard .scorecard.card-s  { border-top-color: var(--dash-s); }
-#panel-dashboard .scorecard.card-total { border-top-color: var(--dash-coral); }
-#panel-dashboard .scorecard-amount.amt-n    { color: var(--dash-n); }
-#panel-dashboard .scorecard-amount.amt-s    { color: var(--dash-s); }
-#panel-dashboard .scorecard-amount.amt-total{ color: var(--dash-coral); }
-#panel-dashboard .split-card,
-#panel-dashboard .chart-card,
-#panel-dashboard .summary-table { background: var(--dash-surface); border-color: var(--dash-border); }
-#panel-dashboard .cat-bar-bg { background: var(--dash-surface2); }
-#panel-dashboard .leg-row { border-color: var(--dash-border); }
-#panel-dashboard .summary-table th { border-color: var(--dash-border); }
-#panel-dashboard .summary-table td { border-color: var(--dash-border); }
-#panel-dashboard .exp-badge.badge-n { background: var(--dash-n-glow); color: var(--dash-n); border-color: rgba(249,199,79,0.4); }
-#panel-dashboard .exp-badge.badge-s { background: var(--dash-s-glow); color: var(--dash-s); border-color: rgba(78,205,196,0.4); }
+
 
 /* Dashboard header banner */
 .dash-banner {
-  background: linear-gradient(135deg, #0d2424 0%, #1a1a0d 50%, #200d0d 100%);
-  border: 1px solid var(--dash-border);
+  background: linear-gradient(135deg, #fff8f2 0%, #f5eef8 100%);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px 20px 20px;
   margin-bottom: 20px;
@@ -60,24 +44,25 @@
 .dash-banner::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 15% 50%, rgba(78,205,196,0.1) 0%, transparent 60%),
-              radial-gradient(ellipse 50% 60% at 85% 50%, rgba(249,199,79,0.1) 0%, transparent 60%);
+  background: radial-gradient(ellipse 70% 60% at 15% 50%, rgba(192,82,126,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 60% at 85% 50%, rgba(42,127,168,0.06) 0%, transparent 60%);
   pointer-events: none;
 }
 .dash-banner-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: relative; }
 .dash-banner-title { font-family: 'Playfair Display', serif; font-size: clamp(18px,4vw,28px); color: var(--text); }
 .dash-banner-title span { color: var(--dash-amber); font-style: italic; }
 .dash-month-nav { display: flex; align-items: center; gap: 6px; }
-.dash-month-nav button { background: var(--dash-surface2); border: 1px solid var(--dash-border); color: var(--dash-mint); border-radius: 8px; font-size: 16px; cursor: pointer; padding: 6px 12px; min-height: 40px; min-width: 40px; touch-action: manipulation; }
-.dash-month-nav button:active { background: var(--dash-border); }
-.dash-month-nav span { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--dash-amber); min-width: 110px; text-align: center; }
-.btn-refresh { padding: 8px 18px; background: linear-gradient(135deg, var(--dash-teal), var(--dash-amber)); color: #0a1a1a; border: none; border-radius: 9px; font-weight: 700; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; min-height: 40px; touch-action: manipulation; }
+.dash-month-nav button { background: var(--surface2); border: 1px solid var(--border); color: var(--sri); border-radius: 8px; font-size: 16px; cursor: pointer; padding: 6px 12px; min-height: 40px; min-width: 40px; touch-action: manipulation; }
+.dash-month-nav button:active { background: var(--border); }
+.dash-month-nav span { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--gold); min-width: 110px; text-align: center; }
+.btn-refresh { padding: 8px 18px; background: linear-gradient(135deg, var(--sri), var(--nandh)); color: #ffffff; border: none; border-radius: 9px; font-weight: 700; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; min-height: 40px; touch-action: manipulation; }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(245,163,199,0.08) 0%,transparent 60%),
-             radial-gradient(ellipse 50% 40% at 80% 80%,rgba(147,216,245,0.08) 0%,transparent 60%);}
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(192,82,126,0.06) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 80% 80%,rgba(42,127,168,0.06) 0%,transparent 60%),
+             radial-gradient(ellipse 40% 30% at 50% 50%,rgba(212,115,10,0.04) 0%,transparent 70%);}
 .app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:16px;}
 
 /* Sync */
@@ -123,10 +108,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .form-group label{display:block;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
 .form-group input,.form-group select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;padding:12px 14px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;appearance:none;min-height:48px;}
 .form-group input:focus,.form-group select:focus{border-color:var(--gold);}
-.form-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a748a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
-.form-group select option{background:#16132b;}
+.form-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a7968' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.form-group select option{background:#ffffff;color:#2c2117;}
 
-.btn-add{width:100%;padding:14px 20px;background:linear-gradient(135deg,var(--gold),#e8b83a);color:#1a1200;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;min-height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.btn-add{width:100%;padding:14px 20px;background:linear-gradient(135deg,var(--nandh),var(--gold));color:#ffffff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;min-height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .btn-add:active{opacity:0.85;transform:scale(0.98);}
 @media(min-width:700px){.btn-add{width:auto;}}
 
@@ -168,7 +153,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .check-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);cursor:pointer;min-height:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .check-row input[type="checkbox"]{display:none;}
 .checkmark{width:20px;height:20px;border:1.5px solid var(--border);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:11px;}
-.check-row input:checked+.checkmark{background:var(--green);border-color:var(--green);color:#0a2018;}
+.check-row input:checked+.checkmark{background:var(--green);border-color:var(--green);color:#ffffff;}
 .check-row input:checked+.checkmark::after{content:'✓';font-weight:700;}
 .check-row.checked-label{color:var(--green);}
 
@@ -177,7 +162,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .actual-amount-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:10px 12px;outline:none;display:none;min-height:44px;}
 .actual-amount-input.visible{display:block;}
 .actual-amount-input:focus{border-color:var(--gold);}
-.btn-save-amt{padding:10px 16px;background:var(--green);color:#0a2018;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;touch-action:manipulation;display:none;white-space:nowrap;}
+.btn-save-amt{padding:10px 16px;background:var(--green);color:#ffffff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;touch-action:manipulation;display:none;white-space:nowrap;}
 .btn-save-amt.visible{display:block;}
 .btn-save-amt:active{opacity:0.8;}
 
@@ -202,7 +187,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .salary-input-row{display:flex;gap:8px;align-items:center;}
 .salary-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:10px 12px;outline:none;min-height:44px;}
 .salary-input:focus{border-color:var(--gold);}
-.btn-save-sal{padding:10px 14px;background:var(--gold);color:#1a1200;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;touch-action:manipulation;white-space:nowrap;}
+.btn-save-sal{padding:10px 14px;background:var(--gold);color:#ffffff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;touch-action:manipulation;white-space:nowrap;}
 .salary-current{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;margin-top:10px;}
 
 /* Balance cards */
@@ -810,12 +795,28 @@ function renderDashboard(){
   const pctN=total?Math.round((spentN/total)*100):50;
   const pctS=100-pctN;
 
-  // Category breakdown (actual only)
+  // Category breakdown: actual + paid expected
   const catN={},catS={};
   CATS.forEach(c=>{catN[c]=0;catS[c]=0;});
+  // Actual expenses
   items.forEach(e=>{if(e.who==='N')catN[e.category]+=e.amount;else catS[e.category]+=e.amount;});
+  // Paid expected expenses
+  expItems.filter(e=>e.paid).forEach(e=>{
+    const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+    if(e.who==='N') catN[e.category]+=amt; else catS[e.category]+=amt;
+  });
   const activeCats=CATS.filter(c=>catN[c]>0||catS[c]>0);
   const maxCat=Math.max(...activeCats.map(c=>Math.max(catN[c],catS[c])),1);
+
+  // All transactions: actual + paid expected merged and sorted
+  const allTxns=[
+    ...items.map(e=>({name:e.name,who:e.who,amount:e.amount,category:e.category,type:'Actual',ts:e.ts})),
+    ...expItems.filter(e=>e.paid).map(e=>({
+      name:e.name,who:e.who,
+      amount:(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount,
+      category:e.category,type:'Expected',ts:e.ts
+    }))
+  ].sort((a,b)=>b.amount-a.amount);
 
   const expPairs=expItems.map(e=>{
     const act=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:(e.paid?e.expectedAmount:null);
@@ -835,19 +836,19 @@ function renderDashboard(){
         <div class="scorecard-label" style="color:rgba(249,199,79,0.6)">Nandhini spent</div>
         <div class="scorecard-name" style="color:var(--dash-n)">Nandhini</div>
         <div class="scorecard-amount amt-n">${fmtINR(spentN)}</div>
-        <div class="scorecard-sub">${salN>0?'Remaining: <span style="color:'+((remN<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR(remN)+'</span>':items.filter(e=>e.who==='N').length+' transactions'}</div>
+        <div class="scorecard-sub">${salN>0?'Remaining: <span style="color:'+((remN<0)?'var(--red)':'var(--green)')+'">'+fmtINR(remN)+'</span>':allTxns.filter(e=>e.who==='N').length+' transactions'}</div>
       </div>
       <div class="scorecard card-s">
-        <div class="scorecard-label" style="color:rgba(78,205,196,0.6)">Srinivasan spent</div>
+        <div class="scorecard-label" style="color:rgba(42,127,168,0.7)">Srinivasan spent</div>
         <div class="scorecard-name" style="color:var(--dash-s)">Srinivasan</div>
         <div class="scorecard-amount amt-s">${fmtINR(spentS)}</div>
-        <div class="scorecard-sub">${salS>0?'Remaining: <span style="color:'+((remS<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR(remS)+'</span>':items.filter(e=>e.who==='S').length+' transactions'}</div>
+        <div class="scorecard-sub">${salS>0?'Remaining: <span style="color:'+((remS<0)?'var(--red)':'var(--green)')+'">'+fmtINR(remS)+'</span>':allTxns.filter(e=>e.who==='S').length+' transactions'}</div>
       </div>
       <div class="scorecard card-total">
-        <div class="scorecard-label" style="color:rgba(244,132,95,0.7)">Combined</div>
-        <div class="scorecard-name" style="color:var(--dash-coral)">Total Spent</div>
+        <div class="scorecard-label" style="color:rgba(212,115,10,0.7)">Combined</div>
+        <div class="scorecard-name" style="color:var(--gold)">Total Spent</div>
         <div class="scorecard-amount amt-total">${fmtINR(total)}</div>
-        <div class="scorecard-sub">${(salN+salS)>0?'Budget left: <span style="color:'+((salN+salS-total<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR((salN+salS)-total)+'</span>':items.length+' transactions'}</div>
+        <div class="scorecard-sub">${(salN+salS)>0?'Budget left: <span style="color:'+((salN+salS-total<0)?'var(--red)':'var(--green)')+'">'+fmtINR((salN+salS)-total)+'</span>':allTxns.length+' transactions'}</div>
       </div>
     </div>
 
@@ -859,7 +860,7 @@ function renderDashboard(){
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-n)" stroke-width="18" stroke-dasharray="${(pctN/100)*circ} ${circ}" stroke-linecap="round"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-s)" stroke-width="18" stroke-dasharray="${(pctS/100)*circ} ${circ}" stroke-dashoffset="${-((pctN/100)*circ)}" stroke-linecap="round"/>
         </svg>
-        <div class="ring-center"><span class="rc-label" style="color:rgba(255,255,255,0.4)">Split</span><span class="rc-val" style="color:var(--dash-amber)">${MONTHS[m].slice(0,3)}</span></div>
+        <div class="ring-center"><span class="rc-label" style="color:var(--muted)">Split</span><span class="rc-val" style="color:var(--gold)">${MONTHS[m].slice(0,3)}</span></div>
       </div>
       <div class="split-legend">
         <div class="leg-row" style="border-color:var(--dash-border)">
@@ -917,16 +918,18 @@ function renderDashboard(){
       </table>
     </div>`:''}
 
-    <!-- All actual transactions -->
-    ${items.length?`
+    <!-- All transactions (actual + paid expected) -->
+    ${allTxns.length?`
     <div class="summary-table" style="background:var(--dash-surface);border-color:var(--dash-border)">
       <table>
-        <thead><tr><th>Expense</th><th>Category</th><th>Paid By</th><th>Amount</th></tr></thead>
-        <tbody>${[...items].sort((a,b)=>b.amount-a.amount).map(e=>{
-          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(249,199,79,0.4)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(78,205,196,0.4)">Srinivasan</span>`;
+        <thead><tr><th>Expense</th><th>Category</th><th>Type</th><th>Paid By</th><th>Amount</th></tr></thead>
+        <tbody>${allTxns.map(e=>{
+          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(192,82,126,0.3)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(42,127,168,0.3)">Srinivasan</span>`;
+          const typeTag=e.type==='Expected'?`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(212,115,10,0.12);color:var(--gold);font-weight:600">Expected</span>`:`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(30,138,94,0.12);color:var(--green);font-weight:600">Actual</span>`;
           return `<tr>
             <td style="font-weight:500">${e.name}</td>
             <td style="color:var(--muted)">${ICONS[e.category]} ${e.category}</td>
+            <td>${typeTag}</td>
             <td>${badge}</td>
             <td style="font-family:'DM Mono',monospace;color:${e.who==='N'?'var(--dash-n)':'var(--dash-s)'}">${fmtINR(e.amount)}</td>
           </tr>`;
