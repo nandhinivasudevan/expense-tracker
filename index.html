@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Nandhini & Srinivasan — Expense Tracker</title>
+<title>Monthly Expense Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -13,6 +13,66 @@
   --gold:#f7d070; --text:#e8e4f5; --muted:#7a748a;
   --green:#6ae6a4; --red:#f57a7a; --radius:16px;
 }
+/* Dashboard colour theme — warm teal/amber/coral */
+:root {
+  --dash-bg: #0d1a1a;
+  --dash-surface: #122020;
+  --dash-surface2: #1a2e2e;
+  --dash-border: #1f3d3d;
+  --dash-teal: #4ecdc4;
+  --dash-amber: #f9c74f;
+  --dash-coral: #f4845f;
+  --dash-mint: #95e1d3;
+  --dash-lavender: #c9b8ff;
+  --dash-n: #f9c74f;      /* Nandhini = amber */
+  --dash-s: #4ecdc4;      /* Srinivasan = teal */
+  --dash-n-glow: rgba(249,199,79,0.15);
+  --dash-s-glow: rgba(78,205,196,0.15);
+}
+#panel-dashboard { background: transparent; }
+#panel-dashboard .scorecard { background: var(--dash-surface); border-color: var(--dash-border); }
+#panel-dashboard .scorecard.card-n  { border-top-color: var(--dash-n); }
+#panel-dashboard .scorecard.card-s  { border-top-color: var(--dash-s); }
+#panel-dashboard .scorecard.card-total { border-top-color: var(--dash-coral); }
+#panel-dashboard .scorecard-amount.amt-n    { color: var(--dash-n); }
+#panel-dashboard .scorecard-amount.amt-s    { color: var(--dash-s); }
+#panel-dashboard .scorecard-amount.amt-total{ color: var(--dash-coral); }
+#panel-dashboard .split-card,
+#panel-dashboard .chart-card,
+#panel-dashboard .summary-table { background: var(--dash-surface); border-color: var(--dash-border); }
+#panel-dashboard .cat-bar-bg { background: var(--dash-surface2); }
+#panel-dashboard .leg-row { border-color: var(--dash-border); }
+#panel-dashboard .summary-table th { border-color: var(--dash-border); }
+#panel-dashboard .summary-table td { border-color: var(--dash-border); }
+#panel-dashboard .exp-badge.badge-n { background: var(--dash-n-glow); color: var(--dash-n); border-color: rgba(249,199,79,0.4); }
+#panel-dashboard .exp-badge.badge-s { background: var(--dash-s-glow); color: var(--dash-s); border-color: rgba(78,205,196,0.4); }
+
+/* Dashboard header banner */
+.dash-banner {
+  background: linear-gradient(135deg, #0d2424 0%, #1a1a0d 50%, #200d0d 100%);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius);
+  padding: 24px 20px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.dash-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 15% 50%, rgba(78,205,196,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 60% at 85% 50%, rgba(249,199,79,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.dash-banner-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; position: relative; }
+.dash-banner-title { font-family: 'Playfair Display', serif; font-size: clamp(18px,4vw,28px); color: var(--text); }
+.dash-banner-title span { color: var(--dash-amber); font-style: italic; }
+.dash-month-nav { display: flex; align-items: center; gap: 6px; }
+.dash-month-nav button { background: var(--dash-surface2); border: 1px solid var(--dash-border); color: var(--dash-mint); border-radius: 8px; font-size: 16px; cursor: pointer; padding: 6px 12px; min-height: 40px; min-width: 40px; touch-action: manipulation; }
+.dash-month-nav button:active { background: var(--dash-border); }
+.dash-month-nav span { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--dash-amber); min-width: 110px; text-align: center; }
+.btn-refresh { padding: 8px 18px; background: linear-gradient(135deg, var(--dash-teal), var(--dash-amber)); color: #0a1a1a; border: none; border-radius: 9px; font-weight: 700; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; min-height: 40px; touch-action: manipulation; }
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -269,19 +329,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="salary-grid">
         <div class="salary-card nandh-sal">
           <div class="salary-name" style="color:var(--nandh)">Nandhini</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Edit anytime — updates for both of you</div>
           <div class="salary-input-row">
             <input class="salary-input" type="number" inputmode="decimal" id="sal-n" placeholder="Enter salary ₹" min="0">
-            <button class="btn-save-sal" onclick="saveSalary('N')">Save</button>
+            <button class="btn-save-sal" onclick="saveSalary('N')">Update</button>
           </div>
-          <div class="salary-current" id="sal-n-display" style="color:var(--nandh)">₹0</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px;">
+            <div class="salary-current" id="sal-n-display" style="color:var(--nandh)">₹0</div>
+            <div style="font-size:11px;color:var(--muted)">current</div>
+          </div>
         </div>
         <div class="salary-card sri-sal">
           <div class="salary-name" style="color:var(--sri)">Srinivasan</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Edit anytime — updates for both of you</div>
           <div class="salary-input-row">
             <input class="salary-input" type="number" inputmode="decimal" id="sal-s" placeholder="Enter salary ₹" min="0">
-            <button class="btn-save-sal" onclick="saveSalary('S')">Save</button>
+            <button class="btn-save-sal" onclick="saveSalary('S')">Update</button>
           </div>
-          <div class="salary-current" id="sal-s-display" style="color:var(--sri)">₹0</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-top:10px;">
+            <div class="salary-current" id="sal-s-display" style="color:var(--sri)">₹0</div>
+            <div style="font-size:11px;color:var(--muted)">current</div>
+          </div>
         </div>
       </div>
     </div>
@@ -396,13 +464,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
   <!-- ══ DASHBOARD TAB ══ -->
   <div class="panel" id="panel-dashboard">
-    <div class="dash-header">
-      <div style="font-family:'Playfair Display',serif;font-size:22px">Monthly Overview</div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div class="month-controls" style="margin-bottom:0">
-          <button onclick="changeDashMonth(-1)">◀</button><span id="dashMonthLabel"></span><button onclick="changeDashMonth(1)">▶</button>
+    <div class="dash-banner">
+      <div class="dash-banner-top">
+        <div class="dash-banner-title">Monthly <span>Expense Tracker</span></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="dash-month-nav">
+            <button onclick="changeDashMonth(-1)">◀</button>
+            <span id="dashMonthLabel"></span>
+            <button onclick="changeDashMonth(1)">▶</button>
+          </div>
+          <button class="btn-refresh" onclick="renderDashboard()">↻ Refresh</button>
         </div>
-        <button class="btn-gen" onclick="renderDashboard()">Refresh</button>
       </div>
     </div>
     <div id="dashboard-content"></div>
@@ -466,8 +538,13 @@ db.ref('salaries').on('value',snap=>{
   salaries=snap.val()||{N:0,S:0};
   const sn=document.getElementById('sal-n-display');
   const ss=document.getElementById('sal-s-display');
+  const inN=document.getElementById('sal-n');
+  const inS=document.getElementById('sal-s');
   if(sn) sn.textContent=fmtINR(salaries.N);
   if(ss) ss.textContent=fmtINR(salaries.S);
+  // Pre-fill inputs with current values so they're always editable
+  if(inN && salaries.N) inN.value=salaries.N;
+  if(inS && salaries.S) inS.value=salaries.S;
   renderMaster();
   setSynced();
 });
@@ -755,43 +832,43 @@ function renderDashboard(){
     <!-- Scorecards -->
     <div class="scorecards">
       <div class="scorecard card-n">
-        <div class="scorecard-label">Nandhini spent</div>
-        <div class="scorecard-name" style="color:var(--nandh)">Nandhini</div>
+        <div class="scorecard-label" style="color:rgba(249,199,79,0.6)">Nandhini spent</div>
+        <div class="scorecard-name" style="color:var(--dash-n)">Nandhini</div>
         <div class="scorecard-amount amt-n">${fmtINR(spentN)}</div>
-        <div class="scorecard-sub">${salN>0?'Remaining: '+fmtINR(remN):items.filter(e=>e.who==='N').length+' transactions'}</div>
+        <div class="scorecard-sub">${salN>0?'Remaining: <span style="color:'+((remN<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR(remN)+'</span>':items.filter(e=>e.who==='N').length+' transactions'}</div>
       </div>
       <div class="scorecard card-s">
-        <div class="scorecard-label">Srinivasan spent</div>
-        <div class="scorecard-name" style="color:var(--sri)">Srinivasan</div>
+        <div class="scorecard-label" style="color:rgba(78,205,196,0.6)">Srinivasan spent</div>
+        <div class="scorecard-name" style="color:var(--dash-s)">Srinivasan</div>
         <div class="scorecard-amount amt-s">${fmtINR(spentS)}</div>
-        <div class="scorecard-sub">${salS>0?'Remaining: '+fmtINR(remS):items.filter(e=>e.who==='S').length+' transactions'}</div>
+        <div class="scorecard-sub">${salS>0?'Remaining: <span style="color:'+((remS<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR(remS)+'</span>':items.filter(e=>e.who==='S').length+' transactions'}</div>
       </div>
       <div class="scorecard card-total">
-        <div class="scorecard-label">Combined</div>
-        <div class="scorecard-name" style="color:var(--gold)">Total Spent</div>
+        <div class="scorecard-label" style="color:rgba(244,132,95,0.7)">Combined</div>
+        <div class="scorecard-name" style="color:var(--dash-coral)">Total Spent</div>
         <div class="scorecard-amount amt-total">${fmtINR(total)}</div>
-        <div class="scorecard-sub">${(salN+salS)>0?'Budget remaining: '+fmtINR((salN+salS)-total):items.length+' transactions'}</div>
+        <div class="scorecard-sub">${(salN+salS)>0?'Budget left: <span style="color:'+((salN+salS-total<0)?'var(--red)':'var(--dash-mint)')+'">'+fmtINR((salN+salS)-total)+'</span>':items.length+' transactions'}</div>
       </div>
     </div>
 
     <!-- Split ring -->
-    <div class="split-card">
+    <div class="split-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
       <div class="ring-wrap">
         <svg viewBox="0 0 160 160">
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="18"/>
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--nandh)" stroke-width="18" stroke-dasharray="${(pctN/100)*circ} ${circ}" stroke-linecap="round"/>
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--sri)" stroke-width="18" stroke-dasharray="${(pctS/100)*circ} ${circ}" stroke-dashoffset="${-((pctN/100)*circ)}" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-surface2)" stroke-width="18"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-n)" stroke-width="18" stroke-dasharray="${(pctN/100)*circ} ${circ}" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-s)" stroke-width="18" stroke-dasharray="${(pctS/100)*circ} ${circ}" stroke-dashoffset="${-((pctN/100)*circ)}" stroke-linecap="round"/>
         </svg>
-        <div class="ring-center"><span class="rc-label">Split</span><span class="rc-val">${MONTHS[m].slice(0,3)}</span></div>
+        <div class="ring-center"><span class="rc-label" style="color:rgba(255,255,255,0.4)">Split</span><span class="rc-val" style="color:var(--dash-amber)">${MONTHS[m].slice(0,3)}</span></div>
       </div>
       <div class="split-legend">
-        <div class="leg-row">
-          <div class="leg-name"><span class="leg-dot" style="background:var(--nandh)"></span>Nandhini</div>
-          <div class="leg-stat"><div class="leg-pct" style="color:var(--nandh)">${pctN}%</div><div class="leg-amt">${fmtINR(spentN)}</div></div>
+        <div class="leg-row" style="border-color:var(--dash-border)">
+          <div class="leg-name"><span class="leg-dot" style="background:var(--dash-n)"></span>Nandhini</div>
+          <div class="leg-stat"><div class="leg-pct" style="color:var(--dash-n)">${pctN}%</div><div class="leg-amt">${fmtINR(spentN)}</div></div>
         </div>
-        <div class="leg-row">
-          <div class="leg-name"><span class="leg-dot" style="background:var(--sri)"></span>Srinivasan</div>
-          <div class="leg-stat"><div class="leg-pct" style="color:var(--sri)">${pctS}%</div><div class="leg-amt">${fmtINR(spentS)}</div></div>
+        <div class="leg-row" style="border-color:var(--dash-border)">
+          <div class="leg-name"><span class="leg-dot" style="background:var(--dash-s)"></span>Srinivasan</div>
+          <div class="leg-stat"><div class="leg-pct" style="color:var(--dash-s)">${pctS}%</div><div class="leg-amt">${fmtINR(spentS)}</div></div>
         </div>
       </div>
     </div>
@@ -799,21 +876,21 @@ function renderDashboard(){
     <!-- Category bars -->
     ${activeCats.length?`
     <div class="chart-section">
-      <div class="chart-card">
-        <div class="chart-card-title" style="color:var(--nandh)">Nandhini — by Category</div>
+      <div class="chart-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
+        <div class="chart-card-title" style="color:var(--dash-n)">Nandhini — by Category</div>
         ${activeCats.filter(c=>catN[c]>0).map(c=>`
           <div class="category-row">
             <div class="cat-label">${ICONS[c]} ${c}</div>
-            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${Math.round((catN[c]/maxCat)*100)}%;background:var(--nandh)"></div></div>
+            <div class="cat-bar-bg" style="background:var(--dash-surface2)"><div class="cat-bar-fill" style="width:${Math.round((catN[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-n),var(--dash-coral))"></div></div>
             <div class="cat-amount">${fmtINR(catN[c])}</div>
           </div>`).join('')}
       </div>
-      <div class="chart-card">
-        <div class="chart-card-title" style="color:var(--sri)">Srinivasan — by Category</div>
+      <div class="chart-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
+        <div class="chart-card-title" style="color:var(--dash-s)">Srinivasan — by Category</div>
         ${activeCats.filter(c=>catS[c]>0).map(c=>`
           <div class="category-row">
             <div class="cat-label">${ICONS[c]} ${c}</div>
-            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${Math.round((catS[c]/maxCat)*100)}%;background:var(--sri)"></div></div>
+            <div class="cat-bar-bg" style="background:var(--dash-surface2)"><div class="cat-bar-fill" style="width:${Math.round((catS[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-s),var(--dash-lavender))"></div></div>
             <div class="cat-amount">${fmtINR(catS[c])}</div>
           </div>`).join('')}
       </div>
@@ -821,19 +898,20 @@ function renderDashboard(){
 
     <!-- Expected vs Actual table -->
     ${expPairs.length?`
-    <div class="summary-table">
+    <div class="summary-table" style="background:var(--dash-surface);border-color:var(--dash-border)">
       <table>
         <thead><tr><th>Expense</th><th>Should Pay</th><th>Expected</th><th>Actual Paid</th><th>Difference</th><th>Status</th></tr></thead>
         <tbody>${expPairs.map(e=>{
           const d=e.diff;
-          const ds=d==null?'—':d>0?`<span style="color:var(--red)">▲ +${fmtINR(d)}</span>`:d<0?`<span style="color:var(--green)">▼ ${fmtINR(d)}</span>`:`<span style="color:var(--muted)">Same</span>`;
+          const ds=d==null?'—':d>0?`<span style="color:var(--red)">▲ +${fmtINR(d)}</span>`:d<0?`<span style="color:var(--dash-teal)">▼ ${fmtINR(Math.abs(d))}</span>`:`<span style="color:var(--muted)">Same</span>`;
+          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(249,199,79,0.4)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(78,205,196,0.4)">Srinivasan</span>`;
           return `<tr>
             <td style="font-weight:500">${e.name}</td>
-            <td><span class="exp-badge ${badgeClass(e.who)}">${whoName(e.who)}</span></td>
-            <td style="font-family:'DM Mono',monospace;color:var(--gold)">${fmtINR(e.expected)}</td>
+            <td>${badge}</td>
+            <td style="font-family:'DM Mono',monospace;color:var(--dash-amber)">${fmtINR(e.expected)}</td>
             <td style="font-family:'DM Mono',monospace">${e.actual!=null?fmtINR(e.actual):'<span style="color:var(--muted)">Unpaid</span>'}</td>
             <td>${ds}</td>
-            <td>${e.paid?'<span style="color:var(--green);font-weight:600">✓ Paid</span>':'<span style="color:var(--red)">Pending</span>'}</td>
+            <td>${e.paid?'<span style="color:var(--dash-teal);font-weight:600">✓ Paid</span>':'<span style="color:var(--dash-coral)">Pending</span>'}</td>
           </tr>`;
         }).join('')}</tbody>
       </table>
@@ -841,16 +919,18 @@ function renderDashboard(){
 
     <!-- All actual transactions -->
     ${items.length?`
-    <div class="summary-table">
+    <div class="summary-table" style="background:var(--dash-surface);border-color:var(--dash-border)">
       <table>
         <thead><tr><th>Expense</th><th>Category</th><th>Paid By</th><th>Amount</th></tr></thead>
-        <tbody>${[...items].sort((a,b)=>b.amount-a.amount).map(e=>`
-          <tr>
+        <tbody>${[...items].sort((a,b)=>b.amount-a.amount).map(e=>{
+          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(249,199,79,0.4)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(78,205,196,0.4)">Srinivasan</span>`;
+          return `<tr>
             <td style="font-weight:500">${e.name}</td>
             <td style="color:var(--muted)">${ICONS[e.category]} ${e.category}</td>
-            <td><span class="exp-badge ${badgeClass(e.who)}">${whoName(e.who)}</span></td>
-            <td style="font-family:'DM Mono',monospace;${e.who==='N'?'color:var(--nandh)':'color:var(--sri)'}">${fmtINR(e.amount)}</td>
-          </tr>`).join('')}
+            <td>${badge}</td>
+            <td style="font-family:'DM Mono',monospace;color:${e.who==='N'?'var(--dash-n)':'var(--dash-s)'}">${fmtINR(e.amount)}</td>
+          </tr>`;
+        }).join('')}
         </tbody>
       </table>
     </div>`:''}
