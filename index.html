@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Monthly Expense Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg:#f5f0eb; --surface:#ffffff; --surface2:#f0ebe4; --border:#e0d8cf;
@@ -12,8 +14,9 @@
   --sri:#2a7fa8; --sri-dark:#1a5f82; --sri-glow:rgba(42,127,168,0.10);
   --gold:#d4730a; --text:#2c2117; --muted:#8a7968;
   --green:#1e8a5e; --red:#c0392b; --radius:16px;
+  --invest:#6a3de8; --invest-glow:rgba(106,61,232,0.10);
+  --budget:#2a8a7f; --budget-glow:rgba(42,138,127,0.10);
 }
-/* Dashboard colour theme — inherits page theme */
 :root {
   --dash-bg: var(--bg);
   --dash-surface: var(--surface);
@@ -30,8 +33,6 @@
   --dash-s-glow: var(--sri-glow);
 }
 
-
-/* Dashboard header banner */
 .dash-banner {
   background: linear-gradient(135deg, #fff8f2 0%, #f5eef8 100%);
   border: 1px solid var(--border);
@@ -65,7 +66,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
              radial-gradient(ellipse 40% 30% at 50% 50%,rgba(212,115,10,0.04) 0%,transparent 70%);}
 .app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:16px;}
 
-/* Sync */
 .sync-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:999;}
 .sync-bar.syncing{background:linear-gradient(90deg,var(--nandh),var(--gold),var(--sri));animation:syncPulse 1s ease infinite;}
 .sync-bar.synced{background:var(--green);}
@@ -76,7 +76,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .sync-status.offline .sync-dot{background:var(--red);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* Header */
 .header{text-align:center;padding:32px 0 24px;border-bottom:1px solid var(--border);margin-bottom:20px;}
 .header-subtitle{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
 .header h1{font-family:'Playfair Display',serif;font-size:clamp(22px,6vw,48px);font-weight:400;line-height:1.15;}
@@ -84,25 +83,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .month-display{margin-top:10px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;}
 .month-display span{color:var(--gold);}
 
-/* Countdown */
 .countdown-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .cd-label{font-size:11px;color:var(--muted);flex:1;min-width:100px;}
 .cd-progress{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;min-width:60px;}
 .cd-fill{height:100%;background:linear-gradient(90deg,var(--nandh),var(--gold),var(--sri));border-radius:2px;}
 .cd-days{font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);white-space:nowrap;}
 
-/* Tabs */
-.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:20px;}
-.tab-btn{flex:1;padding:10px 4px;border:none;border-radius:9px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;min-height:44px;touch-action:manipulation;}
-.tab-btn.active{background:var(--surface2);color:var(--text);}
+/* Tabs - scrollable for more tabs */
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:10px 14px;border:none;border-radius:9px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;min-height:48px;touch-action:manipulation;white-space:nowrap;letter-spacing:0.01em;}
+.tab-btn.active{background:var(--surface2);color:var(--text);font-weight:700;}
 .panel{display:none;}.panel.active{display:block;}
 
-/* Cards / Sections */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
 .section-title{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .section-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* Form grid */
 .form-grid{display:flex;flex-direction:column;gap:12px;}
 @media(min-width:700px){.form-grid{display:grid;grid-template-columns:2fr 1.5fr 1.2fr 1.2fr 1fr;align-items:end;}}
 .form-group label{display:block;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
@@ -115,20 +112,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .btn-add:active{opacity:0.85;transform:scale(0.98);}
 @media(min-width:700px){.btn-add{width:auto;}}
 
-/* Month nav */
 .month-controls{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:6px 12px;margin-bottom:16px;width:fit-content;}
 .month-controls button{background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 10px;min-height:44px;min-width:44px;touch-action:manipulation;}
 .month-controls button:active{color:var(--text);}
 .month-controls span{font-family:'DM Mono',monospace;font-size:13px;color:var(--gold);min-width:110px;text-align:center;}
 
-/* Filters */
 .filter-row{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
-.filter-label{font-size:12px;color:var(--muted);}
-.pills{display:flex;gap:8px;flex-wrap:wrap;}
-.pill{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:var(--surface);color:var(--muted);min-height:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;}
-.pill.active{background:var(--surface2);color:var(--text);border-color:var(--gold);}
+.filter-label{font-size:12px;color:var(--muted);white-space:nowrap;}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 32px 8px 12px;outline:none;cursor:pointer;min-height:38px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a7968' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.2s;}
+.filter-select:focus{border-color:var(--gold);}
+.filter-select option{background:#ffffff;color:#2c2117;}
 
-/* Expense cards */
 .expense-list{display:flex;flex-direction:column;gap:10px;}
 .expense-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;animation:fadeSlide 0.25s ease;}
 .expense-card.nandh-card{border-left:3px solid var(--nandh);}
@@ -148,8 +142,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .btn-del{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;min-height:36px;min-width:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;}
 .btn-del:active{border-color:var(--red);color:var(--red);}
 
-/* Expected checks */
-.exp-checks{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+/* Collapsible expected details */
+.exp-checks{display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:0;border-top:none;max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding-top 0.35s,margin-top 0.35s;}
+.exp-checks.open{max-height:300px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.btn-expand{background:transparent;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:4px 0;text-align:left;touch-action:manipulation;display:flex;align-items:center;gap:4px;margin-top:6px;}
+.btn-expand .arrow{display:inline-block;transition:transform 0.25s;}
+.btn-expand.expanded .arrow{transform:rotate(180deg);}
+
 .check-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);cursor:pointer;min-height:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .check-row input[type="checkbox"]{display:none;}
 .checkmark{width:20px;height:20px;border:1.5px solid var(--border);border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;font-size:11px;}
@@ -157,7 +156,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .check-row input:checked+.checkmark::after{content:'✓';font-weight:700;}
 .check-row.checked-label{color:var(--green);}
 
-/* Actual amount input + save row */
 .actual-amt-row{display:flex;gap:8px;align-items:center;margin-top:4px;}
 .actual-amount-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:10px 12px;outline:none;display:none;min-height:44px;}
 .actual-amount-input.visible{display:block;}
@@ -171,13 +169,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .diff-over{background:rgba(245,122,122,0.15);color:var(--red);}
 .diff-under{background:rgba(106,230,164,0.15);color:var(--green);}
 
-/* Expected summary */
 .exp-sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;}
 .exp-sum-item{text-align:center;}
 .exp-sum-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
 .exp-sum-val{font-family:'DM Mono',monospace;font-size:clamp(15px,4vw,20px);font-weight:500;}
 
-/* ── MASTER TAB ── */
+/* MASTER TAB */
 .salary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
 @media(max-width:500px){.salary-grid{grid-template-columns:1fr;}}
 .salary-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;}
@@ -190,7 +187,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .btn-save-sal{padding:10px 14px;background:var(--gold);color:#ffffff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;touch-action:manipulation;white-space:nowrap;}
 .salary-current{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;margin-top:10px;}
 
-/* Balance cards */
 .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
 @media(max-width:500px){.balance-grid{grid-template-columns:1fr;}}
 .balance-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
@@ -204,13 +200,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .balance-bar-bg{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:10px;}
 .balance-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
 
-/* Combined pot */
 .combined-pot{background:var(--surface);border:1px solid var(--gold);border-radius:12px;padding:20px;text-align:center;margin-bottom:20px;}
 .pot-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px;}
 .pot-amount{font-family:'DM Mono',monospace;font-size:clamp(28px,7vw,44px);font-weight:500;color:var(--gold);}
 .pot-sub{font-size:12px;color:var(--muted);margin-top:6px;}
 
-/* Transaction log in master */
 .txn-log{display:flex;flex-direction:column;gap:8px;}
 .txn-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:var(--surface2);border-radius:9px;font-size:13px;}
 .txn-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
@@ -218,8 +212,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .txn-meta{font-size:11px;color:var(--muted);}
 .txn-amt{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;white-space:nowrap;}
 
-/* Dashboard */
-.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+/* DASHBOARD */
 .btn-gen{padding:10px 20px;background:linear-gradient(135deg,var(--nandh),var(--sri));color:var(--bg);border:none;border-radius:10px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;min-height:44px;touch-action:manipulation;}
 .scorecards{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px;}
 @media(min-width:500px){.scorecards{grid-template-columns:1fr 1fr;}}
@@ -262,7 +255,70 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .empty-state .es-icon{font-size:40px;margin-bottom:14px;}
 .empty-state h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
 
-/* Loading */
+/* INVESTMENTS TAB */
+.inv-form-grid{display:flex;flex-direction:column;gap:12px;}
+@media(min-width:700px){.inv-form-grid{display:grid;grid-template-columns:1.5fr 1.2fr 1.2fr 1fr 1fr 1fr auto;align-items:end;gap:10px;}}
+.invest-list{display:flex;flex-direction:column;gap:10px;}
+.invest-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--invest);border-radius:12px;padding:14px 16px;animation:fadeSlide 0.25s ease;}
+.invest-card.maturing-soon{border-left:3px solid var(--red);background:rgba(192,57,43,0.04);}
+.invest-card.maturing-soon .maturing-tag{display:inline-flex;}
+.maturing-tag{display:none;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:700;background:rgba(192,57,43,0.12);color:var(--red);border:1px solid rgba(192,57,43,0.3);white-space:nowrap;animation:pulse 2s infinite;}
+.invest-badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;background:var(--invest-glow);color:var(--invest);border:1px solid rgba(106,61,232,0.3);white-space:nowrap;}
+.inv-amount{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--invest);}
+.inv-total-bar{background:linear-gradient(135deg,rgba(106,61,232,0.08),rgba(42,127,168,0.08));border:1px solid rgba(106,61,232,0.2);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;}
+.inv-total-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--invest);margin-bottom:6px;}
+.inv-total-amount{font-family:'DM Mono',monospace;font-size:clamp(26px,6vw,40px);font-weight:500;color:var(--invest);}
+.inv-bank-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
+.inv-bank-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.inv-bank-name{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.inv-bank-amt{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--invest);}
+.inv-type-badge{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(212,115,10,0.10);color:var(--gold);font-weight:600;white-space:nowrap;}
+.inv-meta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;}
+.inv-meta-item{font-size:11px;color:var(--muted);}
+.inv-meta-item strong{color:var(--text);}
+/* EF tracker in investments */
+.ef-tracker-card{background:linear-gradient(135deg,rgba(212,115,10,0.07),rgba(30,138,94,0.05));border:1px solid rgba(212,115,10,0.25);border-radius:12px;padding:20px;margin-bottom:16px;}
+.ef-tracker-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ef-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.ef-stat{text-align:center;}
+.ef-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px;}
+.ef-stat-val{font-family:'DM Mono',monospace;font-size:clamp(14px,3.5vw,20px);font-weight:500;}
+.ef-prog-bg{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:12px;}
+.ef-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width 0.6s ease;}
+
+/* BUDGET PLANNER TAB */
+.budget-hero{background:linear-gradient(135deg,rgba(42,138,127,0.08),rgba(212,115,10,0.05));border:1px solid rgba(42,138,127,0.2);border-radius:var(--radius);padding:24px 20px;margin-bottom:20px;text-align:center;}
+.budget-hero-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--budget);margin-bottom:6px;}
+.budget-hero-sub{font-size:13px;color:var(--muted);}
+.budget-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:500px){.budget-grid{grid-template-columns:1fr;}}
+.budget-person-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.budget-person-card.bp-n{border-top:3px solid var(--nandh);}
+.budget-person-card.bp-s{border-top:3px solid var(--sri);}
+.bp-name{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:14px;}
+.bp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.bp-row:last-child{border-bottom:none;}
+.bp-label{color:var(--muted);}
+.bp-val{font-family:'DM Mono',monospace;font-weight:500;}
+.personal-allowance-bar{margin-top:10px;}
+.pa-bar-bg{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin-top:6px;}
+.pa-bar-fill{height:100%;border-radius:5px;transition:width 0.6s ease;}
+.pa-pct-label{font-size:11px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;}
+.alert-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;margin-top:6px;}
+.alert-warn{background:rgba(212,115,10,0.12);color:var(--gold);border:1px solid rgba(212,115,10,0.3);}
+.alert-danger{background:rgba(192,57,43,0.12);color:var(--red);border:1px solid rgba(192,57,43,0.3);}
+.alert-ok{background:rgba(30,138,94,0.12);color:var(--green);border:1px solid rgba(30,138,94,0.3);}
+.emergency-fund-card{background:linear-gradient(135deg,rgba(212,115,10,0.06),rgba(192,82,126,0.04));border:1px solid rgba(212,115,10,0.25);border-radius:var(--radius);padding:22px;margin-bottom:20px;text-align:center;}
+.ef-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);margin-bottom:6px;}
+.ef-subtitle{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.ef-amount{font-family:'DM Mono',monospace;font-size:clamp(28px,7vw,42px);font-weight:500;color:var(--gold);}
+.ef-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;}
+.ef-item{text-align:center;}
+.ef-item-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
+.ef-item-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;}
+.email-note{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:12px;text-align:left;}
+
+/* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;padding:20px;}
 .loading-overlay.hidden{opacity:0;pointer-events:none;}
 .loading-title{font-family:'Playfair Display',serif;font-size:clamp(22px,6vw,32px);margin-bottom:10px;text-align:center;}
@@ -299,16 +355,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 
   <div class="tabs">
-    <button class="tab-btn" onclick="switchTab('master')">🏦 Master</button>
-    <button class="tab-btn active" onclick="switchTab('actual')">💸 Actual</button>
-    <button class="tab-btn" onclick="switchTab('expected')">📋 Expected</button>
+    <button class="tab-btn" onclick="switchTab('master')">🏦 Salary Info</button>
+    <button class="tab-btn active" onclick="switchTab('actual')">💸 Expenses</button>
+    <button class="tab-btn" onclick="switchTab('expected')">📋 Standard</button>
     <button class="tab-btn" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('investments')">📈 Investments</button>
+    <button class="tab-btn" onclick="switchTab('budget')">🎯 Budget</button>
   </div>
 
   <!-- ══ MASTER TAB ══ -->
   <div class="panel" id="panel-master">
-
-    <!-- Salary inputs -->
     <div class="card">
       <div class="section-title"><span class="dot" style="background:var(--gold)"></span>Monthly Salaries</div>
       <div class="salary-grid">
@@ -339,14 +395,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
-    <!-- Combined pot -->
     <div class="combined-pot">
       <div class="pot-label">Combined Monthly Budget</div>
       <div class="pot-amount" id="pot-amount">₹0</div>
       <div class="pot-sub" id="pot-sub">Total spent: ₹0 · Remaining: ₹0</div>
     </div>
 
-    <!-- Individual balances -->
     <div class="balance-grid">
       <div class="balance-card nandh-bal">
         <div class="balance-label">Balance</div>
@@ -366,7 +420,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
-    <!-- Transaction log -->
     <div class="card">
       <div class="section-title"><span class="dot" style="background:var(--muted)"></span>All Transactions This Month</div>
       <div class="month-controls" style="margin-bottom:14px">
@@ -390,7 +443,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="Transport">🚗 Transport</option><option value="Utilities">💡 Utilities</option>
             <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
             <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
-            <option value="Savings">💰 Savings</option><option value="Other">📦 Other</option>
+            <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
+            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+            <option value="Other">📦 Other</option>
           </select>
         </div>
         <div class="form-group"><label>Paid By</label>
@@ -404,12 +459,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <button onclick="changeMonth(-1)">◀</button><span id="actualMonthLabel"></span><button onclick="changeMonth(1)">▶</button>
     </div>
     <div class="filter-row">
-      <span class="filter-label">Filter:</span>
-      <div class="pills" id="actual-filters">
-        <span class="pill active" onclick="setFilter(this,'all')">All</span>
-        <span class="pill" onclick="setFilter(this,'N')">Nandhini</span>
-        <span class="pill" onclick="setFilter(this,'S')">Srinivasan</span>
-      </div>
+      <span class="filter-label">Person:</span>
+      <select class="filter-select" id="actual-filters" onchange="setFilter(this.value)">
+        <option value="all">All</option>
+        <option value="N">Nandhini</option>
+        <option value="S">Srinivasan</option>
+      </select>
+      <span class="filter-label" style="margin-left:12px">Category:</span>
+      <select class="filter-select" id="actual-cat-filters" onchange="setActualCatFilter(this.value)">
+        <option value="all">All Categories</option>
+        <option value="Groceries">🛒 Groceries</option>
+        <option value="Dining">🍽️ Dining</option>
+        <option value="Transport">🚗 Transport</option>
+        <option value="Utilities">💡 Utilities</option>
+        <option value="Healthcare">🏥 Healthcare</option>
+        <option value="Entertainment">🎬 Entertainment</option>
+        <option value="Shopping">🛍️ Shopping</option>
+        <option value="EMI / Rent">🏠 EMI / Rent</option>
+        <option value="Personal">👤 Personal</option>
+        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+        <option value="Savings">💰 Savings</option>
+        <option value="Other">📦 Other</option>
+      </select>
     </div>
     <div class="expense-list" id="actual-list"></div>
   </div>
@@ -426,7 +497,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="Transport">🚗 Transport</option><option value="Utilities">💡 Utilities</option>
             <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
             <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
-            <option value="Savings">💰 Savings</option><option value="Other">📦 Other</option>
+            <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
+            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+            <option value="Other">📦 Other</option>
           </select>
         </div>
         <div class="form-group"><label>Should Pay</label>
@@ -443,6 +516,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="exp-sum-item"><div class="exp-sum-label">Paid</div><div class="exp-sum-val" id="exp-paid" style="color:var(--green)">₹0</div></div>
         <div class="exp-sum-item"><div class="exp-sum-label">Pending</div><div class="exp-sum-val" id="exp-pending" style="color:var(--red)">₹0</div></div>
       </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Person:</span>
+      <select class="filter-select" id="exp-who-filters" onchange="setExpFilter('who',this.value)">
+        <option value="all">All</option>
+        <option value="N">Nandhini</option>
+        <option value="S">Srinivasan</option>
+      </select>
+      <span class="filter-label" style="margin-left:12px">Status:</span>
+      <select class="filter-select" id="exp-status-filters" onchange="setExpFilter('status',this.value)">
+        <option value="all">All</option>
+        <option value="paid">✓ Paid</option>
+        <option value="pending">⏳ Pending</option>
+      </select>
     </div>
     <div class="expense-list" id="expected-list"></div>
   </div>
@@ -464,11 +551,167 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
     <div id="dashboard-content"></div>
   </div>
+
+  <!-- ══ INVESTMENTS TAB ══ -->
+  <div class="panel" id="panel-investments">
+    <div class="card">
+      <div class="section-title"><span class="dot" style="background:var(--invest)"></span>Add Investment Holding</div>
+      <div class="inv-form-grid">
+        <div class="form-group"><label>Investment Name</label><input type="text" id="inv-name" placeholder="e.g. FD - SBI 2yr" autocomplete="off"></div>
+        <div class="form-group"><label>Bank / Institution</label>
+          <select id="inv-bank">
+            <option value="State Bank">🏛️ State Bank</option>
+            <option value="Shriram One">🏦 Shriram One</option>
+            <option value="Hold and Grow">💼 Hold and Grow</option>
+            <option value="Standard Chartered">🌐 Standard Chartered</option>
+            <option value="HDFC Bank Ltd">🔵 HDFC Bank Ltd</option>
+            <option value="ICICI Bank Ltd">🔴 ICICI Bank Ltd</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Investment Type</label>
+          <select id="inv-type">
+            <option value="Fixed Deposit">🔒 Fixed Deposit</option>
+            <option value="Recurring Deposit">📅 Recurring Deposit</option>
+            <option value="Savings">💰 Savings</option>
+            <option value="Mutual Fund">📊 Mutual Fund</option>
+            <option value="Stocks">📈 Stocks</option>
+            <option value="Gold">🥇 Gold</option>
+            <option value="Silver">🥈 Silver</option>
+            <option value="PPF">🏛️ PPF</option>
+            <option value="NPS">🏦 NPS</option>
+            <option value="SSY">👧 SSY</option>
+            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Amount (₹)</label><input type="number" id="inv-amount" placeholder="0" min="0" inputmode="decimal"></div>
+        <div class="form-group"><label>Maturity Amount (₹)</label><input type="number" id="inv-maturity-amount" placeholder="Optional" min="0" inputmode="decimal"></div>
+        <div class="form-group"><label>Maturity Date</label><input type="date" id="inv-maturity-date" style="font-family:'DM Mono',monospace;font-size:14px;"></div>
+        <div class="form-group"><label>&nbsp;</label><button class="btn-add" style="background:linear-gradient(135deg,var(--invest),var(--sri))" onclick="addInvestment()">+ Add</button></div>
+      </div>
+    </div>
+
+    <!-- EF Tracker -->
+    <div class="ef-tracker-card" id="ef-tracker-card">
+      <div class="ef-tracker-title">🛡️ Emergency Fund Tracker <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--muted);margin-left:8px">Target: ₹49,000</span></div>
+      <div class="ef-stat-grid">
+        <div class="ef-stat"><div class="ef-stat-label">Deposited This Month</div><div class="ef-stat-val" id="ef-dep-month" style="color:var(--nandh)">₹0</div></div>
+        <div class="ef-stat"><div class="ef-stat-label">Total Deposited</div><div class="ef-stat-val" id="ef-dep-total" style="color:var(--invest)">₹0</div></div>
+        <div class="ef-stat"><div class="ef-stat-label">Still Needed</div><div class="ef-stat-val" id="ef-dep-rem" style="color:var(--gold)">₹49,000</div></div>
+      </div>
+      <div class="ef-prog-bg"><div class="ef-prog-fill" id="ef-prog-fill" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center" id="ef-prog-label">0% of ₹49,000 target reached</div>
+    </div>
+
+    <!-- Summary + Filters -->
+    <div class="inv-total-bar" id="inv-total-bar">
+      <div class="inv-total-label">Total Portfolio Value</div>
+      <div class="inv-total-amount" id="inv-total-amount">₹0</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px" id="inv-maturity-value-label"></div>
+    </div>
+    <div class="inv-bank-summary" id="inv-bank-summary"></div>
+
+    <!-- Filters -->
+    <div class="filter-row" style="margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <span class="filter-label">Bank:</span>
+      <select class="filter-select" id="inv-bank-filter" onchange="setInvFilter('bank',this.value)">
+        <option value="all">All Banks</option>
+        <option value="State Bank">🏛️ State Bank</option>
+        <option value="Shriram One">🏦 Shriram One</option>
+        <option value="Hold and Grow">💼 Hold and Grow</option>
+        <option value="Standard Chartered">🌐 Standard Chartered</option>
+        <option value="HDFC Bank Ltd">🔵 HDFC Bank Ltd</option>
+        <option value="ICICI Bank Ltd">🔴 ICICI Bank Ltd</option>
+      </select>
+      <span class="filter-label" style="margin-left:12px">Type:</span>
+      <select class="filter-select" id="inv-type-filter" onchange="setInvFilter('type',this.value)">
+        <option value="all">All Types</option>
+        <option value="Fixed Deposit">🔒 Fixed Deposit</option>
+        <option value="Recurring Deposit">📅 Recurring Deposit</option>
+        <option value="Savings">💰 Savings</option>
+        <option value="Mutual Fund">📊 Mutual Fund</option>
+        <option value="Stocks">📈 Stocks</option>
+        <option value="Gold">🥇 Gold</option>
+        <option value="Silver">🥈 Silver</option>
+        <option value="PPF">🏛️ PPF</option>
+        <option value="NPS">🏦 NPS</option>
+        <option value="SSY">👧 SSY</option>
+        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+        <option value="Other">📦 Other</option>
+      </select>
+    </div>
+
+    <div class="invest-list" id="invest-list"></div>
+  </div>
+
+  <!-- ══ BUDGET PLANNER TAB ══ -->
+  <div class="panel" id="panel-budget">
+    <div class="budget-hero">
+      <div class="budget-hero-title">🎯 Budget Planner</div>
+      <div class="budget-hero-sub">Personal allowances, emergency fund &amp; spending limits based on your salaries</div>
+    </div>
+
+    <!-- Emergency Fund -->
+    <div class="emergency-fund-card">
+      <div class="ef-title">🛡️ Emergency Fund</div>
+      <div class="ef-subtitle">10% of combined monthly salary — always protected</div>
+      <div class="ef-amount" id="ef-amount">₹0</div>
+      <div class="ef-grid">
+        <div class="ef-item"><div class="ef-item-label">Nandhini's Share</div><div class="ef-item-val" id="ef-n" style="color:var(--nandh)">₹0</div></div>
+        <div class="ef-item"><div class="ef-item-label">Combined Salary</div><div class="ef-item-val" id="ef-combined" style="color:var(--gold)">₹0</div></div>
+        <div class="ef-item"><div class="ef-item-label">Srini's Share</div><div class="ef-item-val" id="ef-s" style="color:var(--sri)">₹0</div></div>
+      </div>
+    </div>
+
+    <!-- Personal Allowance Cards -->
+    <div class="budget-grid">
+      <div class="budget-person-card bp-n">
+        <div class="bp-name" style="color:var(--nandh)">Nandhini</div>
+        <div class="bp-row"><span class="bp-label">Base Salary</span><span class="bp-val" id="bp-sal-n">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Personal Allowance (5%)</span><span class="bp-val" id="bp-allow-n" style="color:var(--green)">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Personal Spent</span><span class="bp-val" id="bp-spent-n" style="color:var(--nandh)">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Remaining</span><span class="bp-val" id="bp-rem-n">₹0</span></div>
+        <div class="personal-allowance-bar">
+          <div class="pa-bar-bg"><div class="pa-bar-fill" id="pa-bar-n" style="background:var(--nandh);width:0%"></div></div>
+          <div class="pa-pct-label"><span id="pa-pct-n">0% used</span><span>Limit: 5%</span></div>
+          <div id="pa-alert-n"></div>
+        </div>
+        <div class="email-note" id="email-note-n" style="display:none">
+          ⚠️ Alert at 4% → <strong>nandhinivasudevan@gmail.com</strong>
+        </div>
+      </div>
+      <div class="budget-person-card bp-s">
+        <div class="bp-name" style="color:var(--sri)">Srinivasan</div>
+        <div class="bp-row"><span class="bp-label">Base Salary</span><span class="bp-val" id="bp-sal-s">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Personal Allowance (5%)</span><span class="bp-val" id="bp-allow-s" style="color:var(--green)">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Personal Spent</span><span class="bp-val" id="bp-spent-s" style="color:var(--sri)">₹0</span></div>
+        <div class="bp-row"><span class="bp-label">Remaining</span><span class="bp-val" id="bp-rem-s">₹0</span></div>
+        <div class="personal-allowance-bar">
+          <div class="pa-bar-bg"><div class="pa-bar-fill" id="pa-bar-s" style="background:var(--sri);width:0%"></div></div>
+          <div class="pa-pct-label"><span id="pa-pct-s">0% used</span><span>Limit: 5%</span></div>
+          <div id="pa-alert-s"></div>
+        </div>
+        <div class="email-note" id="email-note-s" style="display:none">
+          ⚠️ Alert at 4% → <strong>srinivasan.kunchithapatham@gmail.com</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full budget breakdown table -->
+    <div class="card">
+      <div class="section-title"><span class="dot" style="background:var(--budget)"></span>Full Monthly Budget Breakdown</div>
+      <div id="budget-breakdown"></div>
+    </div>
+  </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
+if(typeof firebase === 'undefined'){
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  document.getElementById('syncStatus').className='sync-status offline';
+  document.getElementById('syncText').textContent='Firebase failed to load';
+  throw new Error('Firebase SDK did not load. Check your internet connection.');
+}
 firebase.initializeApp({
   apiKey:"AIzaSyCm79KaPTCfibPvJysh_xvAuzx4HKW1WFk",
   authDomain:"expense-tracker-c9d68.firebaseapp.com",
@@ -481,14 +724,21 @@ firebase.initializeApp({
 const db = firebase.database();
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const CATS=['Groceries','Dining','Transport','Utilities','Healthcare','Entertainment','Shopping','EMI / Rent','Savings','Other'];
-const ICONS={'Groceries':'🛒','Dining':'🍽️','Transport':'🚗','Utilities':'💡','Healthcare':'🏥','Entertainment':'🎬','Shopping':'🛍️','EMI / Rent':'🏠','Savings':'💰','Other':'📦'};
+const CATS=['Groceries','Dining','Transport','Utilities','Healthcare','Entertainment','Shopping','EMI / Rent','Savings','Personal','Emergency Fund','Other'];
+const ICONS={'Groceries':'🛒','Dining':'🍽️','Transport':'🚗','Utilities':'💡','Healthcare':'🏥','Entertainment':'🎬','Shopping':'🛍️','EMI / Rent':'🏠','Savings':'💰','Personal':'👤','Emergency Fund':'🛡️','Other':'📦'};
+const BANKS=['State Bank','Shriram One','Hold and Grow','Standard Chartered','HDFC Bank Ltd','ICICI Bank Ltd'];
+const BANK_ICONS={'State Bank':'🏛️','Shriram One':'🏦','Hold and Grow':'💼','Standard Chartered':'🌐','HDFC Bank Ltd':'🔵','ICICI Bank Ltd':'🔴'};
+const EF_TARGET=49000;
 
-let actual={}, expected={}, salaries={N:0,S:0};
+let actual={}, expected={}, salaries={N:0,S:0}, investments={};
 let activeMonth=new Date().getMonth(), activeYear=new Date().getFullYear();
 let masterMonth=new Date().getMonth(), masterYear=new Date().getFullYear();
 let dashMonth=new Date().getMonth(),   dashYear=new Date().getFullYear();
-let activeFilter='all';
+let activeFilter='all', activeCatFilter='all';
+let expWhoFilter='all', expStatusFilter='all';
+let invBankFilter='all', invTypeFilter='all';
+// Track if alerts have been sent this session (to avoid spam)
+let alertSentN=false, alertSentS=false;
 
 const fmtINR=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -508,6 +758,7 @@ db.ref('actual').on('value',snap=>{
   actual=snap.val()||{};
   renderActual(); renderMaster();
   if(document.getElementById('panel-dashboard').classList.contains('active')) renderDashboard();
+  if(document.getElementById('panel-budget').classList.contains('active')) renderBudget();
   setSynced(); setLive();
   document.getElementById('loadingOverlay').classList.add('hidden');
 },()=>setOffline());
@@ -516,6 +767,7 @@ db.ref('expected').on('value',snap=>{
   expected=snap.val()||{};
   renderExpected(); renderMaster();
   if(document.getElementById('panel-dashboard').classList.contains('active')) renderDashboard();
+  if(document.getElementById('panel-budget').classList.contains('active')) renderBudget();
   setSynced();
 });
 
@@ -527,10 +779,16 @@ db.ref('salaries').on('value',snap=>{
   const inS=document.getElementById('sal-s');
   if(sn) sn.textContent=fmtINR(salaries.N);
   if(ss) ss.textContent=fmtINR(salaries.S);
-  // Pre-fill inputs with current values so they're always editable
   if(inN && salaries.N) inN.value=salaries.N;
   if(inS && salaries.S) inS.value=salaries.S;
   renderMaster();
+  if(document.getElementById('panel-budget').classList.contains('active')) renderBudget();
+  setSynced();
+});
+
+db.ref('investments').on('value',snap=>{
+  investments=snap.val()||{};
+  renderInvestments();
   setSynced();
 });
 
@@ -538,12 +796,14 @@ setTimeout(()=>document.getElementById('loadingOverlay').classList.add('hidden')
 
 // ── TABS ──
 function switchTab(tab){
-  ['master','actual','expected','dashboard'].forEach((t,i)=>{
+  ['master','actual','expected','dashboard','investments','budget'].forEach((t,i)=>{
     document.querySelectorAll('.tab-btn')[i].classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
   });
   if(tab==='dashboard') renderDashboard();
   if(tab==='master') renderMaster();
+  if(tab==='investments') renderInvestments();
+  if(tab==='budget') renderBudget();
 }
 
 // ── DATES ──
@@ -566,9 +826,21 @@ function changeMasterMonth(d){masterMonth+=d;if(masterMonth<0){masterMonth=11;ma
 function changeDashMonth(d){dashMonth+=d;if(dashMonth<0){dashMonth=11;dashYear--;}if(dashMonth>11){dashMonth=0;dashYear++;}updateAllMonthLabels();renderDashboard();}
 updateAllMonthLabels();
 
-function setFilter(el,val){
-  document.querySelectorAll('#actual-filters .pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active'); activeFilter=val; renderActual();
+function setFilter(val){
+  activeFilter=val; renderActual();
+}
+function setActualCatFilter(val){
+  activeCatFilter=val; renderActual();
+}
+function setExpFilter(type,val){
+  if(type==='who') expWhoFilter=val;
+  else expStatusFilter=val;
+  renderExpected();
+}
+function setInvFilter(type,val){
+  if(type==='bank') invBankFilter=val;
+  else invTypeFilter=val;
+  renderInvestments();
 }
 
 // ── SALARY ──
@@ -580,43 +852,37 @@ function saveSalary(who){
   document.getElementById('sal-'+who.toLowerCase()).value='';
 }
 
-// ── COMPUTE SPENT FOR A PERSON IN A MONTH ──
-// Counts: actual expenses + expected expenses marked paid (deduped if both exist)
-function computeSpent(who, month, year){
-  // Actual expenses paid by this person
-  const actualSpent = Object.values(actual)
-    .filter(e=>e.who===who && e.month===month && e.year===year)
-    .reduce((s,e)=>s+e.amount, 0);
+// ── COMPUTE SPENT ──
+function computeSpent(who,month,year){
+  const actualSpent=Object.values(actual).filter(e=>e.who===who&&e.month===month&&e.year===year).reduce((s,e)=>s+e.amount,0);
+  const expSpent=Object.values(expected).filter(e=>e.who===who&&e.month===month&&e.year===year&&e.paid).reduce((s,e)=>{
+    const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+    return s+amt;
+  },0);
+  return actualSpent+expSpent;
+}
 
-  // Expected paid by this person (mark paid), using actual amount if different
-  const expSpent = Object.values(expected)
-    .filter(e=>e.who===who && e.month===month && e.year===year && e.paid)
-    .reduce((s,e)=>{
-      const amt=(!e.sameAmount && e.actualAmount!=null) ? e.actualAmount : e.expectedAmount;
-      return s+amt;
-    }, 0);
-
-  return actualSpent + expSpent;
+// Compute personal expense spending for a person this month
+function computePersonalSpent(who,month,year){
+  const fromActual=Object.values(actual).filter(e=>e.who===who&&e.month===month&&e.year===year&&e.category==='Personal').reduce((s,e)=>s+e.amount,0);
+  const fromExpected=Object.values(expected).filter(e=>e.who===who&&e.month===month&&e.year===year&&e.paid&&e.category==='Personal').reduce((s,e)=>{
+    const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+    return s+amt;
+  },0);
+  return fromActual+fromExpected;
 }
 
 // ── MASTER RENDER ──
 function renderMaster(){
   const salN=salaries.N||0, salS=salaries.S||0;
   const combined=salN+salS;
-
-  const spentN=computeSpent('N', masterMonth, masterYear);
-  const spentS=computeSpent('S', masterMonth, masterYear);
+  const spentN=computeSpent('N',masterMonth,masterYear);
+  const spentS=computeSpent('S',masterMonth,masterYear);
   const totalSpent=spentN+spentS;
+  const remN=salN-spentN, remS=salS-spentS, remCombined=combined-totalSpent;
 
-  const remN=salN-spentN;
-  const remS=salS-spentS;
-  const remCombined=combined-totalSpent;
-
-  // Update pot
   document.getElementById('pot-amount').textContent=fmtINR(combined);
   document.getElementById('pot-sub').textContent=`Total spent: ${fmtINR(totalSpent)} · Remaining: ${fmtINR(remCombined)}`;
-
-  // Balance cards
   document.getElementById('bal-n-salary').textContent='Salary: '+fmtINR(salN);
   document.getElementById('bal-s-salary').textContent='Salary: '+fmtINR(salS);
   document.getElementById('bal-n-spent').textContent='Spent: '+fmtINR(spentN);
@@ -632,7 +898,6 @@ function renderMaster(){
   document.getElementById('bal-n-bar').style.background=pctN>90?'var(--red)':'var(--nandh)';
   document.getElementById('bal-s-bar').style.background=pctS>90?'var(--red)':'var(--sri)';
 
-  // Transaction log: merge actual + paid expected for this month
   const txns=[];
   Object.values(actual).filter(e=>e.month===masterMonth&&e.year===masterYear).forEach(e=>{
     txns.push({name:e.name,who:e.who,amount:e.amount,category:e.category,type:'actual',ts:e.ts});
@@ -644,18 +909,12 @@ function renderMaster(){
   txns.sort((a,b)=>b.ts-a.ts);
 
   const log=document.getElementById('txn-log');
-  if(!txns.length){
-    log.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No transactions for ${MONTHS[masterMonth]} ${masterYear}</div>`;
-    return;
-  }
+  if(!txns.length){log.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No transactions for ${MONTHS[masterMonth]} ${masterYear}</div>`;return;}
   log.innerHTML=txns.map(t=>`
     <div class="txn-row">
       <div class="txn-left">
         <span class="exp-badge ${badgeClass(t.who)}">${whoName(t.who)}</span>
-        <div>
-          <div class="txn-name">${t.name}</div>
-          <div class="txn-meta">${ICONS[t.category]||'📦'} ${t.category} · ${t.type==='expected'?'Expected':'Actual'}</div>
-        </div>
+        <div><div class="txn-name">${t.name}</div><div class="txn-meta">${ICONS[t.category]||'📦'} ${t.category} · ${t.type==='expected'?'Expected':'Actual'}</div></div>
       </div>
       <div class="txn-amt ${amtClass(t.who)}">−${fmtINR(t.amount)}</div>
     </div>`).join('');
@@ -673,22 +932,40 @@ function addActual(){
 function deleteActual(id){setSyncing();db.ref('actual/'+id).remove();}
 
 function renderActual(){
-  let items=Object.values(actual).filter(e=>e.month===activeMonth&&e.year===activeYear);
+  const now=new Date();
+  // Actual records
+  let actualItems=Object.values(actual).filter(e=>e.month===activeMonth&&e.year===activeYear);
+  // Paid expected records — shown read-only in this tab
+  let paidExpItems=Object.values(expected)
+    .filter(e=>e.month===activeMonth&&e.year===activeYear&&e.paid)
+    .map(e=>({
+      id:e.id,
+      name:e.name+' ✓',
+      category:e.category,
+      who:e.who,
+      amount:(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount,
+      ts:e.ts,
+      fromExpected:true
+    }));
+
+  let items=[...actualItems,...paidExpItems];
   if(activeFilter!=='all') items=items.filter(e=>e.who===activeFilter);
+  if(activeCatFilter!=='all') items=items.filter(e=>e.category===activeCatFilter);
   items.sort((a,b)=>b.ts-a.ts);
+
   const list=document.getElementById('actual-list');
-  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">💳</div><h3>No expenses yet</h3><p>Add your first expense above</p></div>`;return;}
+  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">💳</div><h3>No expenses</h3><p>No expenses match the current filters</p></div>`;return;}
   list.innerHTML=items.map(e=>`
-    <div class="expense-card ${whoClass(e.who)}">
+    <div class="expense-card ${whoClass(e.who)}" style="${e.fromExpected?'opacity:0.85':''}">
       <div class="card-row">
         <div class="card-main">
           <div class="exp-name">${e.name}</div>
-          <div class="exp-meta">${ICONS[e.category]||'📦'} ${e.category}</div>
+          <div class="exp-meta">${ICONS[e.category]||'📦'} ${e.category}${e.fromExpected?' · <span style="color:var(--gold);font-size:11px">Standard Expense</span>':''}</div>
         </div>
         <div class="card-right">
           <span class="exp-badge ${badgeClass(e.who)}">${whoName(e.who)}</span>
           <div class="exp-amount ${amtClass(e.who)}">${fmtINR(e.amount)}</div>
-          <button class="btn-del" onclick="deleteActual('${e.id}')">✕</button>
+          ${e.fromExpected?'':'<button class="btn-del" onclick="deleteActual(\''+e.id+'\')">✕</button>'}
         </div>
       </div>
     </div>`).join('');
@@ -715,11 +992,22 @@ function saveActualAmount(id){
   db.ref('expected/'+id).update({actualAmount:val});
 }
 
+// Toggle expand/collapse for expected card details
+function toggleExpand(id){
+  const checks=document.getElementById('checks-'+id);
+  const btn=document.getElementById('expand-btn-'+id);
+  if(!checks||!btn) return;
+  const isOpen=checks.classList.contains('open');
+  checks.classList.toggle('open',!isOpen);
+  btn.classList.toggle('expanded',!isOpen);
+  btn.querySelector('.arrow').textContent=isOpen?'▾':'▴';
+}
+
 function renderExpected(){
   const now=new Date();
-  const items=Object.values(expected).filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear());
+  const allItems=Object.values(expected).filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear());
   let total=0,paid=0;
-  items.forEach(e=>{
+  allItems.forEach(e=>{
     total+=e.expectedAmount;
     if(e.paid) paid+=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
   });
@@ -727,8 +1015,14 @@ function renderExpected(){
   document.getElementById('exp-paid').textContent=fmtINR(paid);
   document.getElementById('exp-pending').textContent=fmtINR(total-paid);
 
+  // Apply filters
+  let items=[...allItems];
+  if(expWhoFilter!=='all') items=items.filter(e=>e.who===expWhoFilter);
+  if(expStatusFilter==='paid') items=items.filter(e=>e.paid);
+  if(expStatusFilter==='pending') items=items.filter(e=>!e.paid);
+
   const list=document.getElementById('expected-list');
-  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><h3>No expected expenses</h3><p>Add recurring or planned expenses above</p></div>`;return;}
+  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><h3>No expected expenses</h3><p>${allItems.length?'No items match the filters':'Add recurring or planned expenses above'}</p></div>`;return;}
   items.sort((a,b)=>a.ts-b.ts);
 
   list.innerHTML=items.map(e=>{
@@ -746,12 +1040,15 @@ function renderExpected(){
           <span class="exp-badge ${badgeClass(e.who)}">${whoName(e.who)}</span>
           <div style="text-align:right">
             <div class="exp-amount" style="color:${e.paid?'var(--green)':'var(--gold)'}">${fmtINR(effAmt)}</div>
-            ${hasDiff?`<div class="diff-tag ${diff>0?'diff-over':'diff-under'} visible">${diff>0?'▲ over by ':'▼ saved '}${fmtINR(Math.abs(diff))}</div>`:''}
+            ${hasDiff?`<div class="diff-tag ${diff>0?'diff-over':'diff-under'} visible">${diff>0?'▲ over':'▼ saved'} ${fmtINR(Math.abs(diff))}</div>`:''}
           </div>
           <button class="btn-del" onclick="deleteExpected('${e.id}')">✕</button>
         </div>
       </div>
-      <div class="exp-checks">
+      <button class="btn-expand" id="expand-btn-${e.id}" onclick="toggleExpand('${e.id}')">
+        <span>Details &amp; Payment</span> <span class="arrow">▾</span>
+      </button>
+      <div class="exp-checks" id="checks-${e.id}">
         <label class="check-row ${e.paid?'checked-label':''}">
           <input type="checkbox" ${e.paid?'checked':''} onchange="togglePaid('${e.id}')">
           <span class="checkmark"></span>
@@ -765,16 +1062,275 @@ function renderExpected(){
         ${!e.sameAmount?`
         <div class="actual-amt-row">
           <input class="actual-amount-input visible" type="number" inputmode="decimal"
-            id="ainp-${e.id}"
-            placeholder="Actual amount paid ₹"
-            value="${e.actualAmount!=null?e.actualAmount:''}"
-            min="0">
+            id="ainp-${e.id}" placeholder="Actual amount paid ₹"
+            value="${e.actualAmount!=null?e.actualAmount:''}" min="0">
           <button class="btn-save-amt visible" onclick="saveActualAmount('${e.id}')">Save</button>
-        </div>
-        `:''}
+        </div>`:''}
       </div>
     </div>`;
   }).join('');
+}
+
+// ── INVESTMENTS ──
+function addInvestment(){
+  const name=document.getElementById('inv-name').value.trim();
+  const amount=parseFloat(document.getElementById('inv-amount').value);
+  if(!name||isNaN(amount)||amount<=0){alert('Please fill in a name and valid amount.');return;}
+  const maturityAmount=parseFloat(document.getElementById('inv-maturity-amount').value)||null;
+  const maturityDate=document.getElementById('inv-maturity-date').value||null;
+  const id=uid(); setSyncing();
+  db.ref('investments/'+id).set({
+    id, name,
+    bank: document.getElementById('inv-bank').value,
+    type: document.getElementById('inv-type').value,
+    amount, maturityAmount, maturityDate,
+    month: new Date().getMonth(), year: new Date().getFullYear(),
+    ts: Date.now()
+  });
+  document.getElementById('inv-name').value='';
+  document.getElementById('inv-amount').value='';
+  document.getElementById('inv-maturity-amount').value='';
+  document.getElementById('inv-maturity-date').value='';
+}
+function deleteInvestment(id){setSyncing();db.ref('investments/'+id).remove();}
+
+function isMaturingSoon(dateStr){
+  if(!dateStr) return false;
+  const mat=new Date(dateStr);
+  const now=new Date();
+  const diff=(mat-now)/(1000*60*60*24);
+  return diff>=0 && diff<=60; // within 60 days = ~2 months
+}
+function daysUntilMaturity(dateStr){
+  if(!dateStr) return null;
+  const mat=new Date(dateStr);
+  const now=new Date();
+  const diff=Math.round((mat-now)/(1000*60*60*24));
+  return diff;
+}
+function fmtDate(dateStr){
+  if(!dateStr) return '';
+  const d=new Date(dateStr);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function renderInvestments(){
+  const allItems=Object.values(investments).sort((a,b)=>b.ts-a.ts);
+  const total=allItems.reduce((s,e)=>s+e.amount,0);
+  const totalMaturity=allItems.filter(e=>e.maturityAmount).reduce((s,e)=>s+e.maturityAmount,0);
+
+  document.getElementById('inv-total-amount').textContent=fmtINR(total);
+  const mvLabel=document.getElementById('inv-maturity-value-label');
+  if(mvLabel) mvLabel.textContent=totalMaturity>0?`Expected maturity value: ${fmtINR(totalMaturity)}`:'';
+
+  // EF Tracker — counts investments of type Emergency Fund + actual/expected with category Emergency Fund
+  const now=new Date();
+  const efFromInv=allItems.filter(e=>e.type==='Emergency Fund');
+  const efFromActual=Object.values(actual).filter(e=>e.category==='Emergency Fund');
+  const efFromExpected=Object.values(expected).filter(e=>e.category==='Emergency Fund'&&e.paid);
+
+  const efThisMonthInv=efFromInv.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>s+e.amount,0);
+  const efThisMonthAct=efFromActual.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>s+e.amount,0);
+  const efThisMonthExp=efFromExpected.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>{
+    return s+((!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount);
+  },0);
+  const efThisMonth=efThisMonthInv+efThisMonthAct+efThisMonthExp;
+
+  const efTotalInv=efFromInv.reduce((s,e)=>s+e.amount,0);
+  const efTotalAct=efFromActual.reduce((s,e)=>s+e.amount,0);
+  const efTotalExp=efFromExpected.reduce((s,e)=>{
+    return s+((!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount);
+  },0);
+  const efTotal=efTotalInv+efTotalAct+efTotalExp;
+  const efRem=Math.max(0,EF_TARGET-efTotal);
+  const efPct=Math.min(100,Math.round((efTotal/EF_TARGET)*100));
+  document.getElementById('ef-dep-month').textContent=fmtINR(efThisMonth);
+  document.getElementById('ef-dep-total').textContent=fmtINR(efTotal);
+  document.getElementById('ef-dep-rem').textContent=fmtINR(efRem);
+  document.getElementById('ef-prog-fill').style.width=efPct+'%';
+  document.getElementById('ef-prog-label').textContent=efPct+'% of '+fmtINR(EF_TARGET)+' target reached';
+
+  // Bank summary (all items unfiltered)
+  const bankTotals={};
+  BANKS.forEach(b=>bankTotals[b]=0);
+  allItems.forEach(e=>{bankTotals[e.bank]=(bankTotals[e.bank]||0)+e.amount;});
+  const activeBanks=BANKS.filter(b=>bankTotals[b]>0);
+  const bankSummary=document.getElementById('inv-bank-summary');
+  bankSummary.innerHTML=activeBanks.length?activeBanks.map(b=>`
+    <div class="inv-bank-chip">
+      <div class="inv-bank-name">${BANK_ICONS[b]||'🏦'} ${b}</div>
+      <div class="inv-bank-amt">${fmtINR(bankTotals[b])}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">${total>0?Math.round((bankTotals[b]/total)*100)+'% of total':''}</div>
+    </div>`).join(''):'';
+
+  // Apply filters to list
+  let items=[...allItems];
+  if(invBankFilter!=='all') items=items.filter(e=>e.bank===invBankFilter);
+  if(invTypeFilter!=='all') items=items.filter(e=>e.type===invTypeFilter);
+
+  const list=document.getElementById('invest-list');
+  if(!items.length){
+    list.innerHTML=`<div class="empty-state"><div class="es-icon">📈</div><h3>${allItems.length?'No items match filters':'No investments yet'}</h3><p>${allItems.length?'Try clearing the filters':'Add your first holding above'}</p></div>`;
+    return;
+  }
+
+  // Sort: maturing soon first, then by amount desc
+  items.sort((a,b)=>{
+    const aSoon=isMaturingSoon(a.maturityDate)?0:1;
+    const bSoon=isMaturingSoon(b.maturityDate)?0:1;
+    if(aSoon!==bSoon) return aSoon-bSoon;
+    return b.amount-a.amount;
+  });
+
+  list.innerHTML=items.map(e=>{
+    const soon=isMaturingSoon(e.maturityDate);
+    const days=daysUntilMaturity(e.maturityDate);
+    const daysLabel=days!=null?(days<0?'Matured':`${days}d left`):'';
+    return `
+    <div class="invest-card ${soon?'maturing-soon':''}">
+      <div class="card-row">
+        <div class="card-main">
+          <div class="exp-name">${e.name}</div>
+          <div class="exp-meta">${BANK_ICONS[e.bank]||'🏦'} ${e.bank}</div>
+        </div>
+        <div class="card-right" style="flex-wrap:wrap;justify-content:flex-end;gap:6px">
+          <span class="maturing-tag">🔔 Matures in ${daysLabel}</span>
+          <span class="inv-type-badge">${e.type}</span>
+          <div class="inv-amount">${fmtINR(e.amount)}</div>
+          <button class="btn-del" onclick="deleteInvestment('${e.id}')">✕</button>
+        </div>
+      </div>
+      ${(e.maturityDate||e.maturityAmount)?`
+      <div class="inv-meta-row">
+        ${e.maturityDate?`<div class="inv-meta-item">📅 Matures: <strong>${fmtDate(e.maturityDate)}${daysLabel?' ('+daysLabel+')':''}</strong></div>`:''}
+        ${e.maturityAmount?`<div class="inv-meta-item">💰 Maturity value: <strong style="color:var(--green)">${fmtINR(e.maturityAmount)}</strong></div>`:''}
+        ${e.maturityAmount&&e.amount?`<div class="inv-meta-item">📈 Gain: <strong style="color:var(--invest)">${fmtINR(e.maturityAmount-e.amount)}</strong></div>`:''}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── BUDGET PLANNER ──
+function checkAndSendAlert(who, pct){
+  const key = who==='N'?'alertSentN':'alertSentS';
+  const email = who==='N'?'nandhinivasudevan@gmail.com':'srinivasan.kunchithapatham@gmail.com';
+  const name = whoName(who);
+  // Show email note when at/above 4%
+  const noteEl = document.getElementById('email-note-'+who.toLowerCase());
+  if(pct>=4){
+    if(noteEl) noteEl.style.display='block';
+    // In a real app, a backend would send the email.
+    // Here we log it and show a one-time browser notification as a simulation.
+    if(who==='N'&&!alertSentN){
+      alertSentN=true;
+      console.log(`ALERT: ${name} has reached ${pct.toFixed(1)}% of personal allowance. Email would be sent to ${email}`);
+      showAlertToast(name, pct, email);
+    } else if(who==='S'&&!alertSentS){
+      alertSentS=true;
+      console.log(`ALERT: ${name} has reached ${pct.toFixed(1)}% of personal allowance. Email would be sent to ${email}`);
+      showAlertToast(name, pct, email);
+    }
+  } else {
+    if(noteEl) noteEl.style.display='none';
+  }
+}
+
+function showAlertToast(name, pct, email){
+  const toast=document.createElement('div');
+  toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--gold);border-radius:12px;padding:14px 20px;font-size:13px;z-index:9999;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;';
+  toast.innerHTML=`<div style="font-weight:700;color:var(--gold);margin-bottom:4px">⚠️ Personal Spend Alert</div><div style="color:var(--text)">${name} has used <strong>${pct.toFixed(1)}%</strong> of personal allowance.</div><div style="color:var(--muted);font-size:11px;margin-top:6px">Alert email → ${email}</div>`;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 6000);
+}
+
+function renderBudget(){
+  const salN=salaries.N||0, salS=salaries.S||0;
+  const combined=salN+salS;
+  const now=new Date();
+  const m=now.getMonth(), y=now.getFullYear();
+
+  // Emergency fund: 10% of combined
+  const ef=combined*0.10;
+  const efN=salN*0.10, efS=salS*0.10;
+  document.getElementById('ef-amount').textContent=fmtINR(ef);
+  document.getElementById('ef-n').textContent=fmtINR(efN);
+  document.getElementById('ef-s').textContent=fmtINR(efS);
+  document.getElementById('ef-combined').textContent=fmtINR(combined);
+
+  // Personal allowance: 5% of each person's salary
+  const allowN=salN*0.05, allowS=salS*0.05;
+  const spentPersonalN=computePersonalSpent('N',m,y);
+  const spentPersonalS=computePersonalSpent('S',m,y);
+  const remPN=allowN-spentPersonalN, remPS=allowS-spentPersonalS;
+  const pctPN=allowN>0?Math.min(120,(spentPersonalN/allowN)*100):0;
+  const pctPS=allowS>0?Math.min(120,(spentPersonalS/allowS)*100):0;
+  // As % of salary (for 4% alert threshold)
+  const salPctN=salN>0?(spentPersonalN/salN)*100:0;
+  const salPctS=salS>0?(spentPersonalS/salS)*100:0;
+
+  document.getElementById('bp-sal-n').textContent=fmtINR(salN);
+  document.getElementById('bp-sal-s').textContent=fmtINR(salS);
+  document.getElementById('bp-allow-n').textContent=fmtINR(allowN);
+  document.getElementById('bp-allow-s').textContent=fmtINR(allowS);
+  document.getElementById('bp-spent-n').textContent=fmtINR(spentPersonalN);
+  document.getElementById('bp-spent-s').textContent=fmtINR(spentPersonalS);
+  document.getElementById('bp-rem-n').textContent=fmtINR(remPN);
+  document.getElementById('bp-rem-s').textContent=fmtINR(remPS);
+  document.getElementById('bp-rem-n').style.color=remPN<0?'var(--red)':'var(--green)';
+  document.getElementById('bp-rem-s').style.color=remPS<0?'var(--red)':'var(--green)';
+
+  // Progress bars
+  document.getElementById('pa-bar-n').style.width=Math.min(100,pctPN)+'%';
+  document.getElementById('pa-bar-s').style.width=Math.min(100,pctPS)+'%';
+  document.getElementById('pa-bar-n').style.background=pctPN>=100?'var(--red)':pctPN>=80?'var(--gold)':'var(--nandh)';
+  document.getElementById('pa-bar-s').style.background=pctPS>=100?'var(--red)':pctPS>=80?'var(--gold)':'var(--sri)';
+  document.getElementById('pa-pct-n').textContent=pctPN.toFixed(0)+'% of 5% allowance used';
+  document.getElementById('pa-pct-s').textContent=pctPS.toFixed(0)+'% of 5% allowance used';
+
+  // Alert badges
+  const alertN=document.getElementById('pa-alert-n');
+  const alertS=document.getElementById('pa-alert-s');
+  if(pctPN>=100) alertN.innerHTML='<span class="alert-badge alert-danger">🚨 Allowance exceeded!</span>';
+  else if(pctPN>=80) alertN.innerHTML='<span class="alert-badge alert-warn">⚠️ Approaching limit</span>';
+  else alertN.innerHTML='<span class="alert-badge alert-ok">✓ Within budget</span>';
+  if(pctPS>=100) alertS.innerHTML='<span class="alert-badge alert-danger">🚨 Allowance exceeded!</span>';
+  else if(pctPS>=80) alertS.innerHTML='<span class="alert-badge alert-warn">⚠️ Approaching limit</span>';
+  else alertS.innerHTML='<span class="alert-badge alert-ok">✓ Within budget</span>';
+
+  // Email alerts check (threshold: 4% of salary)
+  checkAndSendAlert('N', salPctN);
+  checkAndSendAlert('S', salPctS);
+
+  // Budget breakdown table
+  const totalSpentN=computeSpent('N',m,y);
+  const totalSpentS=computeSpent('S',m,y);
+  const breakdown=document.getElementById('budget-breakdown');
+  const rows=[
+    {label:'Gross Salary',n:fmtINR(salN),s:fmtINR(salS),both:fmtINR(combined),highlight:false},
+    {label:'Emergency Fund (10%)',n:fmtINR(efN),s:fmtINR(efS),both:fmtINR(ef),highlight:true,color:'var(--gold)'},
+    {label:'Personal Allowance (5%)',n:fmtINR(allowN),s:fmtINR(allowS),both:fmtINR(allowN+allowS),highlight:true,color:'var(--budget)'},
+    {label:'Personal Spent (this month)',n:fmtINR(spentPersonalN),s:fmtINR(spentPersonalS),both:fmtINR(spentPersonalN+spentPersonalS),highlight:false},
+    {label:'Total Spent (this month)',n:fmtINR(totalSpentN),s:fmtINR(totalSpentS),both:fmtINR(totalSpentN+totalSpentS),highlight:false},
+    {label:'Net Remaining',n:fmtINR(salN-totalSpentN),s:fmtINR(salS-totalSpentS),both:fmtINR(combined-totalSpentN-totalSpentS),highlight:true,color:(combined-totalSpentN-totalSpentS)<0?'var(--red)':'var(--green)'},
+  ];
+  breakdown.innerHTML=`<div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;min-width:360px">
+      <thead><tr>
+        <th style="text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);">Item</th>
+        <th style="text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--nandh);padding:10px 12px;border-bottom:1px solid var(--border);">Nandhini</th>
+        <th style="text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--sri);padding:10px 12px;border-bottom:1px solid var(--border);">Srinivasan</th>
+        <th style="text-align:right;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);padding:10px 12px;border-bottom:1px solid var(--border);">Combined</th>
+      </tr></thead>
+      <tbody>${rows.map(r=>`
+        <tr style="background:${r.highlight?'var(--surface2)':'transparent'}">
+          <td style="padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);color:${r.color||'var(--text)'};font-weight:${r.highlight?'600':'400'}">${r.label}</td>
+          <td style="padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:${r.color||'var(--text)'}">${r.n}</td>
+          <td style="padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:${r.color||'var(--text)'}">${r.s}</td>
+          <td style="padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:${r.color||'var(--gold)'};font-weight:600">${r.both}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
 }
 
 // ── DASHBOARD ──
@@ -788,19 +1344,15 @@ function renderDashboard(){
     return;
   }
 
-  // Totals: actual + paid expected
   const spentN=computeSpent('N',m,y);
   const spentS=computeSpent('S',m,y);
   const total=spentN+spentS;
   const pctN=total?Math.round((spentN/total)*100):50;
   const pctS=100-pctN;
 
-  // Category breakdown: actual + paid expected
   const catN={},catS={};
   CATS.forEach(c=>{catN[c]=0;catS[c]=0;});
-  // Actual expenses
   items.forEach(e=>{if(e.who==='N')catN[e.category]+=e.amount;else catS[e.category]+=e.amount;});
-  // Paid expected expenses
   expItems.filter(e=>e.paid).forEach(e=>{
     const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
     if(e.who==='N') catN[e.category]+=amt; else catS[e.category]+=amt;
@@ -808,7 +1360,6 @@ function renderDashboard(){
   const activeCats=CATS.filter(c=>catN[c]>0||catS[c]>0);
   const maxCat=Math.max(...activeCats.map(c=>Math.max(catN[c],catS[c])),1);
 
-  // All transactions: actual + paid expected merged and sorted
   const allTxns=[
     ...items.map(e=>({name:e.name,who:e.who,amount:e.amount,category:e.category,type:'Actual',ts:e.ts})),
     ...expItems.filter(e=>e.paid).map(e=>({
@@ -824,91 +1375,78 @@ function renderDashboard(){
   });
 
   const r=60,cx=80,cy=80,circ=2*Math.PI*r;
-
-  // Salary remaining
   const salN=salaries.N||0, salS=salaries.S||0;
   const remN=salN-spentN, remS=salS-spentS;
 
   container.innerHTML=`
-    <!-- Scorecards -->
     <div class="scorecards">
       <div class="scorecard card-n">
-        <div class="scorecard-label" style="color:rgba(249,199,79,0.6)">Nandhini spent</div>
+        <div class="scorecard-label">Nandhini spent</div>
         <div class="scorecard-name" style="color:var(--dash-n)">Nandhini</div>
         <div class="scorecard-amount amt-n">${fmtINR(spentN)}</div>
         <div class="scorecard-sub">${salN>0?'Remaining: <span style="color:'+((remN<0)?'var(--red)':'var(--green)')+'">'+fmtINR(remN)+'</span>':allTxns.filter(e=>e.who==='N').length+' transactions'}</div>
       </div>
       <div class="scorecard card-s">
-        <div class="scorecard-label" style="color:rgba(42,127,168,0.7)">Srinivasan spent</div>
+        <div class="scorecard-label">Srinivasan spent</div>
         <div class="scorecard-name" style="color:var(--dash-s)">Srinivasan</div>
         <div class="scorecard-amount amt-s">${fmtINR(spentS)}</div>
         <div class="scorecard-sub">${salS>0?'Remaining: <span style="color:'+((remS<0)?'var(--red)':'var(--green)')+'">'+fmtINR(remS)+'</span>':allTxns.filter(e=>e.who==='S').length+' transactions'}</div>
       </div>
       <div class="scorecard card-total">
-        <div class="scorecard-label" style="color:rgba(212,115,10,0.7)">Combined</div>
+        <div class="scorecard-label">Combined</div>
         <div class="scorecard-name" style="color:var(--gold)">Total Spent</div>
         <div class="scorecard-amount amt-total">${fmtINR(total)}</div>
         <div class="scorecard-sub">${(salN+salS)>0?'Budget left: <span style="color:'+((salN+salS-total<0)?'var(--red)':'var(--green)')+'">'+fmtINR((salN+salS)-total)+'</span>':allTxns.length+' transactions'}</div>
       </div>
     </div>
 
-    <!-- Split ring -->
-    <div class="split-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
+    <div class="split-card">
       <div class="ring-wrap">
         <svg viewBox="0 0 160 160">
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-surface2)" stroke-width="18"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-n)" stroke-width="18" stroke-dasharray="${(pctN/100)*circ} ${circ}" stroke-linecap="round"/>
           <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--dash-s)" stroke-width="18" stroke-dasharray="${(pctS/100)*circ} ${circ}" stroke-dashoffset="${-((pctN/100)*circ)}" stroke-linecap="round"/>
         </svg>
-        <div class="ring-center"><span class="rc-label" style="color:var(--muted)">Split</span><span class="rc-val" style="color:var(--gold)">${MONTHS[m].slice(0,3)}</span></div>
+        <div class="ring-center"><span class="rc-label">Split</span><span class="rc-val">${MONTHS[m].slice(0,3)}</span></div>
       </div>
       <div class="split-legend">
-        <div class="leg-row" style="border-color:var(--dash-border)">
-          <div class="leg-name"><span class="leg-dot" style="background:var(--dash-n)"></span>Nandhini</div>
-          <div class="leg-stat"><div class="leg-pct" style="color:var(--dash-n)">${pctN}%</div><div class="leg-amt">${fmtINR(spentN)}</div></div>
-        </div>
-        <div class="leg-row" style="border-color:var(--dash-border)">
-          <div class="leg-name"><span class="leg-dot" style="background:var(--dash-s)"></span>Srinivasan</div>
-          <div class="leg-stat"><div class="leg-pct" style="color:var(--dash-s)">${pctS}%</div><div class="leg-amt">${fmtINR(spentS)}</div></div>
-        </div>
+        <div class="leg-row"><div class="leg-name"><span class="leg-dot" style="background:var(--dash-n)"></span>Nandhini</div><div class="leg-stat"><div class="leg-pct" style="color:var(--dash-n)">${pctN}%</div><div class="leg-amt">${fmtINR(spentN)}</div></div></div>
+        <div class="leg-row"><div class="leg-name"><span class="leg-dot" style="background:var(--dash-s)"></span>Srinivasan</div><div class="leg-stat"><div class="leg-pct" style="color:var(--dash-s)">${pctS}%</div><div class="leg-amt">${fmtINR(spentS)}</div></div></div>
       </div>
     </div>
 
-    <!-- Category bars -->
     ${activeCats.length?`
     <div class="chart-section">
-      <div class="chart-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
+      <div class="chart-card">
         <div class="chart-card-title" style="color:var(--dash-n)">Nandhini — by Category</div>
         ${activeCats.filter(c=>catN[c]>0).map(c=>`
           <div class="category-row">
             <div class="cat-label">${ICONS[c]} ${c}</div>
-            <div class="cat-bar-bg" style="background:var(--dash-surface2)"><div class="cat-bar-fill" style="width:${Math.round((catN[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-n),var(--dash-coral))"></div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${Math.round((catN[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-n),var(--dash-coral))"></div></div>
             <div class="cat-amount">${fmtINR(catN[c])}</div>
           </div>`).join('')}
       </div>
-      <div class="chart-card" style="background:var(--dash-surface);border-color:var(--dash-border)">
+      <div class="chart-card">
         <div class="chart-card-title" style="color:var(--dash-s)">Srinivasan — by Category</div>
         ${activeCats.filter(c=>catS[c]>0).map(c=>`
           <div class="category-row">
             <div class="cat-label">${ICONS[c]} ${c}</div>
-            <div class="cat-bar-bg" style="background:var(--dash-surface2)"><div class="cat-bar-fill" style="width:${Math.round((catS[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-s),var(--dash-lavender))"></div></div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${Math.round((catS[c]/maxCat)*100)}%;background:linear-gradient(90deg,var(--dash-s),var(--dash-lavender))"></div></div>
             <div class="cat-amount">${fmtINR(catS[c])}</div>
           </div>`).join('')}
       </div>
     </div>`:''}
 
-    <!-- Expected vs Actual table -->
     ${expPairs.length?`
-    <div class="summary-table" style="background:var(--dash-surface);border-color:var(--dash-border)">
+    <div class="summary-table">
       <table>
         <thead><tr><th>Expense</th><th>Should Pay</th><th>Expected</th><th>Actual Paid</th><th>Difference</th><th>Status</th></tr></thead>
         <tbody>${expPairs.map(e=>{
           const d=e.diff;
           const ds=d==null?'—':d>0?`<span style="color:var(--red)">▲ +${fmtINR(d)}</span>`:d<0?`<span style="color:var(--dash-teal)">▼ ${fmtINR(Math.abs(d))}</span>`:`<span style="color:var(--muted)">Same</span>`;
-          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(249,199,79,0.4)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(78,205,196,0.4)">Srinivasan</span>`;
+          const badge=e.who==='N'?`<span class="exp-badge badge-n">Nandhini</span>`:`<span class="exp-badge badge-s">Srinivasan</span>`;
           return `<tr>
-            <td style="font-weight:500">${e.name}</td>
-            <td>${badge}</td>
+            <td style="font-weight:500">${e.name}</td><td>${badge}</td>
             <td style="font-family:'DM Mono',monospace;color:var(--dash-amber)">${fmtINR(e.expected)}</td>
             <td style="font-family:'DM Mono',monospace">${e.actual!=null?fmtINR(e.actual):'<span style="color:var(--muted)">Unpaid</span>'}</td>
             <td>${ds}</td>
@@ -918,27 +1456,75 @@ function renderDashboard(){
       </table>
     </div>`:''}
 
-    <!-- All transactions (actual + paid expected) -->
     ${allTxns.length?`
-    <div class="summary-table" style="background:var(--dash-surface);border-color:var(--dash-border)">
+    <div class="summary-table">
       <table>
         <thead><tr><th>Expense</th><th>Category</th><th>Type</th><th>Paid By</th><th>Amount</th></tr></thead>
         <tbody>${allTxns.map(e=>{
-          const badge=e.who==='N'?`<span class="exp-badge" style="background:var(--dash-n-glow);color:var(--dash-n);border:1px solid rgba(192,82,126,0.3)">Nandhini</span>`:`<span class="exp-badge" style="background:var(--dash-s-glow);color:var(--dash-s);border:1px solid rgba(42,127,168,0.3)">Srinivasan</span>`;
+          const badge=e.who==='N'?`<span class="exp-badge badge-n">Nandhini</span>`:`<span class="exp-badge badge-s">Srinivasan</span>`;
           const typeTag=e.type==='Expected'?`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(212,115,10,0.12);color:var(--gold);font-weight:600">Expected</span>`:`<span style="font-size:11px;padding:2px 7px;border-radius:4px;background:rgba(30,138,94,0.12);color:var(--green);font-weight:600">Actual</span>`;
           return `<tr>
             <td style="font-weight:500">${e.name}</td>
             <td style="color:var(--muted)">${ICONS[e.category]} ${e.category}</td>
-            <td>${typeTag}</td>
-            <td>${badge}</td>
+            <td>${typeTag}</td><td>${badge}</td>
             <td style="font-family:'DM Mono',monospace;color:${e.who==='N'?'var(--dash-n)':'var(--dash-s)'}">${fmtINR(e.amount)}</td>
           </tr>`;
-        }).join('')}
-        </tbody>
+        }).join('')}</tbody>
       </table>
     </div>`:''}
   `;
 }
+
+// ── MONTHLY EMAIL SCHEDULER (28th at 23:00) ──
+// Since this is a pure frontend app, we can't truly send emails server-side.
+// This function fires when the app is open at the right time, logs the summary,
+// shows a prominent toast reminder, and marks in localStorage so it only fires once per month.
+function buildMonthlySummaryText(){
+  const now=new Date();
+  const m=now.getMonth(), y=now.getFullYear();
+  const salN=salaries.N||0, salS=salaries.S||0;
+  const spentN=computeSpent('N',m,y);
+  const spentS=computeSpent('S',m,y);
+  const total=spentN+spentS;
+  const combined=salN+salS;
+  const catTotals={};
+  CATS.forEach(c=>catTotals[c]=0);
+  Object.values(actual).filter(e=>e.month===m&&e.year===y).forEach(e=>{catTotals[e.category]+=e.amount;});
+  const topCats=CATS.filter(c=>catTotals[c]>0).sort((a,b)=>catTotals[b]-catTotals[a]).slice(0,5);
+  return {
+    subject:`Monthly Expense Summary — ${MONTHS[m]} ${y}`,
+    body:`Hi Nandhini & Srinivasan,\n\nHere's your ${MONTHS[m]} ${y} summary:\n\nNandhini spent: ${fmtINR(spentN)} (of ${fmtINR(salN)})\nSrinivasan spent: ${fmtINR(spentS)} (of ${fmtINR(salS)})\nCombined: ${fmtINR(total)} of ${fmtINR(combined)} budget\nRemaining: ${fmtINR(combined-total)}\n\nTop categories:\n${topCats.map(c=>`  ${ICONS[c]} ${c}: ${fmtINR(catTotals[c])}`).join('\n')}\n\nGreat work this month! 💪`,
+    to:['nandhinivasudevan@gmail.com','srinivasan.kunchithapatham@gmail.com']
+  };
+}
+
+function checkMonthlyEmailSchedule(){
+  const now=new Date();
+  if(now.getDate()!==28) return;
+  if(now.getHours()<23) return;
+  const key=`monthly_email_sent_${now.getMonth()}_${now.getFullYear()}`;
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key,'1');
+  const summary=buildMonthlySummaryText();
+  console.log('📧 MONTHLY SUMMARY EMAIL\nTo:',summary.to.join(', '),'\nSubject:',summary.subject,'\n\n',summary.body);
+  // Show a prominent in-app banner
+  const banner=document.createElement('div');
+  banner.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--surface);border:2px solid var(--gold);border-radius:14px;padding:16px 22px;font-size:13px;z-index:9999;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,0.15);';
+  banner.innerHTML=`
+    <div style="font-weight:700;color:var(--gold);font-size:15px;margin-bottom:8px">📊 Monthly Summary Ready!</div>
+    <div style="color:var(--text);margin-bottom:8px">It's the 28th — your ${MONTHS[now.getMonth()]} summary has been prepared.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Email reminder sent to:<br>nandhinivasudevan@gmail.com<br>srinivasan.kunchithapatham@gmail.com</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="switchTab('dashboard');this.closest('div[style]').remove()" style="flex:1;padding:8px;background:linear-gradient(135deg,var(--nandh),var(--sri));color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">View Dashboard</button>
+      <button onclick="this.closest('div[style]').remove()" style="padding:8px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">✕</button>
+    </div>`;
+  document.body.appendChild(banner);
+  setTimeout(()=>banner.remove(),20000);
+}
+
+// Check every minute
+setInterval(checkMonthlyEmailSchedule, 60000);
+checkMonthlyEmailSchedule();
 </script>
 </body>
 </html>
