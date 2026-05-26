@@ -141,6 +141,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .amount-n{color:var(--nandh);}.amount-s{color:var(--sri);}
 .btn-del{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;min-height:36px;min-width:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;}
 .btn-del:active{border-color:var(--red);color:var(--red);}
+.btn-edit{background:transparent;border:1px solid var(--border);color:var(--sri);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:13px;min-height:36px;min-width:36px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;}
+.btn-edit:active{border-color:var(--sri);background:var(--sri-glow);}
+/* Collapsed expected card — click anywhere on name row to expand */
+.exp-card-header{cursor:pointer;user-select:none;-webkit-user-select:none;}
+.exp-card-header:active{opacity:0.8;}
 
 /* Collapsible expected details */
 .exp-checks{display:flex;flex-direction:column;gap:10px;margin-top:0;padding-top:0;border-top:none;max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding-top 0.35s,margin-top 0.35s;}
@@ -317,6 +322,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ef-item-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
 .ef-item-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;}
 .email-note{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:12px;text-align:left;}
+
+/* Pie chart grid */
+#budget-pie-section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+@media(max-width:560px){#budget-pie-section{grid-template-columns:1fr;}}
 
 /* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;padding:20px;}
@@ -517,19 +526,72 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="exp-sum-item"><div class="exp-sum-label">Pending</div><div class="exp-sum-val" id="exp-pending" style="color:var(--red)">₹0</div></div>
       </div>
     </div>
-    <div class="filter-row">
+    <div class="filter-row" style="flex-wrap:wrap;gap:8px 14px">
       <span class="filter-label">Person:</span>
       <select class="filter-select" id="exp-who-filters" onchange="setExpFilter('who',this.value)">
         <option value="all">All</option>
         <option value="N">Nandhini</option>
         <option value="S">Srinivasan</option>
       </select>
-      <span class="filter-label" style="margin-left:12px">Status:</span>
+      <span class="filter-label">Status:</span>
       <select class="filter-select" id="exp-status-filters" onchange="setExpFilter('status',this.value)">
         <option value="all">All</option>
         <option value="paid">✓ Paid</option>
         <option value="pending">⏳ Pending</option>
       </select>
+      <span class="filter-label">Category:</span>
+      <select class="filter-select" id="exp-cat-filters" onchange="setExpFilter('cat',this.value)">
+        <option value="all">All Categories</option>
+        <option value="Groceries">🛒 Groceries</option>
+        <option value="Dining">🍽️ Dining</option>
+        <option value="Transport">🚗 Transport</option>
+        <option value="Utilities">💡 Utilities</option>
+        <option value="Healthcare">🏥 Healthcare</option>
+        <option value="Entertainment">🎬 Entertainment</option>
+        <option value="Shopping">🛍️ Shopping</option>
+        <option value="EMI / Rent">🏠 EMI / Rent</option>
+        <option value="Savings">💰 Savings</option>
+        <option value="Personal">👤 Personal</option>
+        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+        <option value="Other">📦 Other</option>
+      </select>
+    </div>
+    <!-- Filter summary bar — shown when filters active -->
+    <div id="exp-filter-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:12px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px">Filtered Results</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;">
+        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">Showing</div><div id="efs-count" style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text)">0</div></div>
+        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">Total Amt</div><div id="efs-total" style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--gold)">₹0</div></div>
+        <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px">Paid</div><div id="efs-paid" style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--green)">₹0</div></div>
+      </div>
+    </div>
+    <!-- Edit modal -->
+    <div id="exp-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(44,33,23,0.45);z-index:8000;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--surface);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:18px;color:var(--text)">✏️ Edit Expense</div>
+        <input type="hidden" id="edit-exp-id">
+        <div class="form-group" style="margin-bottom:12px"><label>Expense Name</label><input type="text" id="edit-exp-name" autocomplete="off"></div>
+        <div class="form-group" style="margin-bottom:12px"><label>Category</label>
+          <select id="edit-exp-cat">
+            <option value="Groceries">🛒 Groceries</option><option value="Dining">🍽️ Dining</option>
+            <option value="Transport">🚗 Transport</option><option value="Utilities">💡 Utilities</option>
+            <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
+            <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
+            <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
+            <option value="Emergency Fund">🛡️ Emergency Fund</option><option value="Other">📦 Other</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px"><label>Should Pay</label>
+          <select id="edit-exp-who"><option value="N">Nandhini</option><option value="S">Srinivasan</option></select>
+        </div>
+        <div class="form-group" style="margin-bottom:20px"><label>Expected Amount (₹)</label>
+          <input type="number" id="edit-exp-amount" min="0" inputmode="decimal">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="saveExpectedEdit()" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--nandh),var(--gold));color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">Save Changes</button>
+          <button onclick="closeExpEdit()" style="padding:13px 18px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
     </div>
     <div class="expense-list" id="expected-list"></div>
   </div>
@@ -697,6 +759,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
+    <!-- Pie Charts -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="budget-pie-section">
+      <div class="card" style="padding:20px">
+        <div class="section-title" style="font-size:15px;margin-bottom:4px"><span class="dot" style="background:var(--green)"></span>Actual Expenses</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">By category this month</div>
+        <div style="position:relative;width:100%;max-width:280px;margin:0 auto">
+          <canvas id="pie-actual" style="width:100%;height:auto;display:block"></canvas>
+          <div id="pie-actual-tooltip" style="display:none;position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.12);min-width:160px;"></div>
+        </div>
+        <div id="pie-actual-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div class="card" style="padding:20px">
+        <div class="section-title" style="font-size:15px;margin-bottom:4px"><span class="dot" style="background:var(--gold)"></span>Standard Expenses</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">By category this month</div>
+        <div style="position:relative;width:100%;max-width:280px;margin:0 auto">
+          <canvas id="pie-expected" style="width:100%;height:auto;display:block"></canvas>
+          <div id="pie-expected-tooltip" style="display:none;position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.12);min-width:160px;"></div>
+        </div>
+        <div id="pie-expected-legend" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+
     <!-- Full budget breakdown table -->
     <div class="card">
       <div class="section-title"><span class="dot" style="background:var(--budget)"></span>Full Monthly Budget Breakdown</div>
@@ -735,7 +819,7 @@ let activeMonth=new Date().getMonth(), activeYear=new Date().getFullYear();
 let masterMonth=new Date().getMonth(), masterYear=new Date().getFullYear();
 let dashMonth=new Date().getMonth(),   dashYear=new Date().getFullYear();
 let activeFilter='all', activeCatFilter='all';
-let expWhoFilter='all', expStatusFilter='all';
+let expWhoFilter='all', expStatusFilter='all', expCatFilter='all';
 let invBankFilter='all', invTypeFilter='all';
 // Track if alerts have been sent this session (to avoid spam)
 let alertSentN=false, alertSentS=false;
@@ -834,7 +918,8 @@ function setActualCatFilter(val){
 }
 function setExpFilter(type,val){
   if(type==='who') expWhoFilter=val;
-  else expStatusFilter=val;
+  else if(type==='status') expStatusFilter=val;
+  else if(type==='cat') expCatFilter=val;
   renderExpected();
 }
 function setInvFilter(type,val){
@@ -995,12 +1080,11 @@ function saveActualAmount(id){
 // Toggle expand/collapse for expected card details
 function toggleExpand(id){
   const checks=document.getElementById('checks-'+id);
-  const btn=document.getElementById('expand-btn-'+id);
-  if(!checks||!btn) return;
+  const hint=document.getElementById('expand-hint-'+id);
+  if(!checks) return;
   const isOpen=checks.classList.contains('open');
   checks.classList.toggle('open',!isOpen);
-  btn.classList.toggle('expanded',!isOpen);
-  btn.querySelector('.arrow').textContent=isOpen?'▾':'▴';
+  if(hint) hint.textContent=isOpen?'tap for details ▾':'collapse ▴';
 }
 
 function renderExpected(){
@@ -1020,9 +1104,28 @@ function renderExpected(){
   if(expWhoFilter!=='all') items=items.filter(e=>e.who===expWhoFilter);
   if(expStatusFilter==='paid') items=items.filter(e=>e.paid);
   if(expStatusFilter==='pending') items=items.filter(e=>!e.paid);
+  if(expCatFilter!=='all') items=items.filter(e=>e.category===expCatFilter);
+
+  // Filter summary bar — show when any filter is active
+  const filtersActive = expWhoFilter!=='all' || expStatusFilter!=='all' || expCatFilter!=='all';
+  const summaryBar = document.getElementById('exp-filter-summary');
+  if(filtersActive && items.length){
+    summaryBar.style.display='block';
+    let fTotal=0, fPaid=0;
+    items.forEach(e=>{
+      const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+      fTotal+=e.expectedAmount;
+      if(e.paid) fPaid+=amt;
+    });
+    document.getElementById('efs-count').textContent=items.length+' item'+(items.length!==1?'s':'');
+    document.getElementById('efs-total').textContent=fmtINR(fTotal);
+    document.getElementById('efs-paid').textContent=fmtINR(fPaid);
+  } else {
+    summaryBar.style.display='none';
+  }
 
   const list=document.getElementById('expected-list');
-  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><h3>No expected expenses</h3><p>${allItems.length?'No items match the filters':'Add recurring or planned expenses above'}</p></div>`;return;}
+  if(!items.length){list.innerHTML=`<div class="empty-state"><div class="es-icon">📋</div><h3>No standard expenses</h3><p>${allItems.length?'No items match the filters':'Add recurring or planned expenses above'}</p></div>`;return;}
   items.sort((a,b)=>a.ts-b.ts);
 
   list.innerHTML=items.map(e=>{
@@ -1030,25 +1133,30 @@ function renderExpected(){
     const diff=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount-e.expectedAmount:0;
     const hasDiff=!e.sameAmount&&e.actualAmount!=null&&diff!==0;
     return `
-    <div class="expense-card exp-border" style="opacity:${e.paid?'0.7':'1'}">
-      <div class="card-row">
+    <div class="expense-card exp-border" style="opacity:${e.paid?'0.75':'1'}">
+      <!-- Clickable header row: name + amount + action buttons -->
+      <div class="card-row exp-card-header" onclick="toggleExpand('${e.id}')">
         <div class="card-main">
-          <div class="exp-name" style="${e.paid?'text-decoration:line-through;color:var(--muted)':''}">${e.name}</div>
-          <div class="exp-meta">${ICONS[e.category]||'📦'} ${e.category}</div>
+          <div class="exp-name" style="${e.paid?'text-decoration:line-through;color:var(--muted)':''}">
+            ${e.paid?'✓ ':''}${e.name}
+          </div>
+          <div class="exp-meta" style="margin-top:2px">
+            <span class="exp-badge ${badgeClass(e.who)}" style="font-size:10px;padding:2px 7px">${whoName(e.who)}</span>
+            <span style="color:var(--muted);font-size:11px;margin-left:6px" id="expand-hint-${e.id}">tap for details ▾</span>
+          </div>
         </div>
-        <div class="card-right">
-          <span class="exp-badge ${badgeClass(e.who)}">${whoName(e.who)}</span>
+        <div class="card-right" onclick="event.stopPropagation()">
           <div style="text-align:right">
             <div class="exp-amount" style="color:${e.paid?'var(--green)':'var(--gold)'}">${fmtINR(effAmt)}</div>
-            ${hasDiff?`<div class="diff-tag ${diff>0?'diff-over':'diff-under'} visible">${diff>0?'▲ over':'▼ saved'} ${fmtINR(Math.abs(diff))}</div>`:''}
+            ${hasDiff?`<div class="diff-tag ${diff>0?'diff-over':'diff-under'} visible" style="display:inline-block">${diff>0?'▲':'▼'} ${fmtINR(Math.abs(diff))}</div>`:''}
           </div>
-          <button class="btn-del" onclick="deleteExpected('${e.id}')">✕</button>
+          <button class="btn-edit" onclick="openExpEdit('${e.id}')" title="Edit">✏️</button>
+          <button class="btn-del" onclick="deleteExpected('${e.id}')" title="Delete">✕</button>
         </div>
       </div>
-      <button class="btn-expand" id="expand-btn-${e.id}" onclick="toggleExpand('${e.id}')">
-        <span>Details &amp; Payment</span> <span class="arrow">▾</span>
-      </button>
+      <!-- Collapsible details (category + paid toggle + amount diff) -->
       <div class="exp-checks" id="checks-${e.id}">
+        <div style="font-size:11px;color:var(--muted);padding:2px 0 6px">${ICONS[e.category]||'📦'} ${e.category} &nbsp;·&nbsp; Expected: ${fmtINR(e.expectedAmount)}</div>
         <label class="check-row ${e.paid?'checked-label':''}">
           <input type="checkbox" ${e.paid?'checked':''} onchange="togglePaid('${e.id}')">
           <span class="checkmark"></span>
@@ -1069,6 +1177,38 @@ function renderExpected(){
       </div>
     </div>`;
   }).join('');
+}
+
+// ── EDIT EXPECTED ──
+function openExpEdit(id){
+  const e=expected[id];
+  if(!e) return;
+  document.getElementById('edit-exp-id').value=id;
+  document.getElementById('edit-exp-name').value=e.name;
+  document.getElementById('edit-exp-amount').value=e.expectedAmount;
+  document.getElementById('edit-exp-who').value=e.who;
+  // set category
+  const catSel=document.getElementById('edit-exp-cat');
+  for(let i=0;i<catSel.options.length;i++) if(catSel.options[i].value===e.category){catSel.selectedIndex=i;break;}
+  const modal=document.getElementById('exp-edit-modal');
+  modal.style.display='flex';
+}
+function closeExpEdit(){
+  document.getElementById('exp-edit-modal').style.display='none';
+}
+function saveExpectedEdit(){
+  const id=document.getElementById('edit-exp-id').value;
+  const name=document.getElementById('edit-exp-name').value.trim();
+  const amount=parseFloat(document.getElementById('edit-exp-amount').value);
+  if(!name||isNaN(amount)||amount<=0){alert('Please enter a valid name and amount.');return;}
+  setSyncing();
+  db.ref('expected/'+id).update({
+    name,
+    expectedAmount:amount,
+    who:document.getElementById('edit-exp-who').value,
+    category:document.getElementById('edit-exp-cat').value
+  });
+  closeExpEdit();
 }
 
 // ── INVESTMENTS ──
@@ -1331,6 +1471,170 @@ function renderBudget(){
       </tbody>
     </table>
   </div>`;
+
+  // ── PIE CHARTS ──
+  const PIE_PALETTE=[
+    '#c0527e','#2a7fa8','#d4730a','#1e8a5e','#7c5cbf',
+    '#e07040','#3aabcc','#b5922a','#5aab6e','#a04060',
+    '#6a3de8','#2a8a7f'
+  ];
+
+  // Build category data for actual expenses
+  const actCatData={};
+  Object.values(actual).filter(e=>e.month===m&&e.year===y).forEach(e=>{
+    actCatData[e.category]=(actCatData[e.category]||0)+e.amount;
+  });
+  // Also include paid expected items in actual pie
+  Object.values(expected).filter(e=>e.month===m&&e.year===y&&e.paid).forEach(e=>{
+    const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+    actCatData[e.category]=(actCatData[e.category]||0)+amt;
+  });
+
+  // Build category data for standard (expected) expenses
+  const expCatData={};
+  Object.values(expected).filter(e=>e.month===m&&e.year===y).forEach(e=>{
+    expCatData[e.category]=(expCatData[e.category]||0)+e.expectedAmount;
+  });
+
+  drawPieChart('pie-actual','pie-actual-tooltip','pie-actual-legend', actCatData, PIE_PALETTE);
+  drawPieChart('pie-expected','pie-expected-tooltip','pie-expected-legend', expCatData, PIE_PALETTE);
+}
+
+function drawPieChart(canvasId, tooltipId, legendId, data, palette){
+  const canvas=document.getElementById(canvasId);
+  const tooltip=document.getElementById(tooltipId);
+  const legend=document.getElementById(legendId);
+  if(!canvas) return;
+
+  // Filter zero values
+  const entries=Object.entries(data).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((s,[,v])=>s+v,0);
+
+  if(!entries.length){
+    canvas.style.display='none';
+    legend.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0">No data this month</div>';
+    return;
+  }
+  canvas.style.display='block';
+
+  const size=Math.min(canvas.offsetWidth||260, 260);
+  canvas.width=size;
+  canvas.height=size;
+  const ctx=canvas.getContext('2d');
+  const cx=size/2, cy=size/2, r=size/2-10, ir=r*0.52;
+
+  ctx.clearRect(0,0,size,size);
+
+  // Draw slices
+  let startAngle=-Math.PI/2;
+  const slices=entries.map(([cat,val],i)=>{
+    const sweep=(val/total)*2*Math.PI;
+    const color=palette[i%palette.length];
+    const midAngle=startAngle+sweep/2;
+    const slice={cat,val,color,startAngle,sweep,midAngle};
+    startAngle+=sweep;
+    return slice;
+  });
+
+  function drawSlices(hoveredIdx){
+    ctx.clearRect(0,0,size,size);
+    // Draw donut hole background
+    ctx.beginPath();ctx.arc(cx,cy,ir,0,2*Math.PI);
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#fff';
+    ctx.fill();
+    slices.forEach((s,i)=>{
+      const expand=hoveredIdx===i?8:0;
+      const ex=Math.cos(s.midAngle)*expand, ey=Math.sin(s.midAngle)*expand;
+      ctx.beginPath();
+      ctx.moveTo(cx+ex,cy+ey);
+      ctx.arc(cx+ex,cy+ey,r,s.startAngle,s.startAngle+s.sweep);
+      ctx.arc(cx+ex,cy+ey,ir,s.startAngle+s.sweep,s.startAngle,true);
+      ctx.closePath();
+      ctx.fillStyle=s.color;
+      ctx.globalAlpha=hoveredIdx===-1||hoveredIdx===i?1:0.55;
+      ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#fff';
+      ctx.lineWidth=2;
+      ctx.stroke();
+    });
+    // Center label
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text').trim()||'#2c2117';
+    ctx.font=`600 ${Math.round(size*0.065)}px DM Sans, sans-serif`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(fmtINR(total),cx,cy);
+  }
+
+  drawSlices(-1);
+
+  // Legend
+  legend.innerHTML=entries.map(([cat,val],i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;gap:8px">
+      <div style="display:flex;align-items:center;gap:6px;min-width:0">
+        <span style="width:10px;height:10px;border-radius:50%;background:${palette[i%palette.length]};flex-shrink:0;display:inline-block"></span>
+        <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ICONS[cat]||'📦'} ${cat}</span>
+      </div>
+      <span style="font-family:'DM Mono',monospace;font-weight:500;flex-shrink:0">${fmtINR(val)}</span>
+    </div>`).join('');
+
+  // Hover interaction
+  function getHoveredSlice(mx,my){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width, scaleY=canvas.height/rect.height;
+    const x=(mx-rect.left)*scaleX-cx, y=(my-rect.top)*scaleY-cy;
+    const dist=Math.sqrt(x*x+y*y);
+    if(dist<ir||dist>r+10) return -1;
+    let angle=Math.atan2(y,x);
+    // Normalize angle to start from -PI/2
+    const startBase=-Math.PI/2;
+    let rel=angle-startBase;
+    if(rel<0) rel+=2*Math.PI;
+    let cumAngle=0;
+    for(let i=0;i<slices.length;i++){
+      cumAngle+=slices[i].sweep;
+      if(rel<=cumAngle) return i;
+    }
+    return -1;
+  }
+
+  function showTooltip(idx, mx, my){
+    if(idx===-1){tooltip.style.display='none';return;}
+    const s=slices[idx];
+    const pct=((s.val/total)*100).toFixed(1);
+    tooltip.style.display='block';
+    tooltip.innerHTML=`<div style="font-weight:700;margin-bottom:4px">${ICONS[s.cat]||'📦'} ${s.cat}</div><div style="color:var(--invest);font-family:'DM Mono',monospace;font-size:14px">${fmtINR(s.val)}</div><div style="color:var(--muted);margin-top:2px">${pct}% of total</div>`;
+    // Position tooltip — keep inside card
+    const rect=canvas.getBoundingClientRect();
+    const cardRect=canvas.parentElement.getBoundingClientRect();
+    let tx=mx-cardRect.left+10, ty=my-cardRect.top+10;
+    if(tx+180>cardRect.width) tx=mx-cardRect.left-180;
+    if(ty+80>cardRect.height) ty=my-cardRect.top-80;
+    tooltip.style.left=tx+'px';
+    tooltip.style.top=ty+'px';
+  }
+
+  canvas.onmousemove=function(e){
+    const idx=getHoveredSlice(e.clientX,e.clientY);
+    drawSlices(idx);
+    showTooltip(idx,e.clientX,e.clientY);
+  };
+  canvas.onmouseleave=function(){
+    drawSlices(-1);
+    tooltip.style.display='none';
+  };
+  // Touch support
+  canvas.ontouchstart=canvas.ontouchmove=function(e){
+    e.preventDefault();
+    const t=e.touches[0];
+    const idx=getHoveredSlice(t.clientX,t.clientY);
+    drawSlices(idx);
+    showTooltip(idx,t.clientX,t.clientY);
+  };
+  canvas.ontouchend=function(){
+    drawSlices(-1);
+    tooltip.style.display='none';
+  };
 }
 
 // ── DASHBOARD ──
