@@ -282,14 +282,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .inv-meta-item{font-size:11px;color:var(--muted);}
 .inv-meta-item strong{color:var(--text);}
 /* EF tracker in investments */
-.ef-tracker-card{background:linear-gradient(135deg,rgba(212,115,10,0.07),rgba(30,138,94,0.05));border:1px solid rgba(212,115,10,0.25);border-radius:12px;padding:20px;margin-bottom:16px;}
-.ef-tracker-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.ef-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.ef-stat{text-align:center;}
-.ef-stat-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px;}
-.ef-stat-val{font-family:'DM Mono',monospace;font-size:clamp(14px,3.5vw,20px);font-weight:500;}
-.ef-prog-bg{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:12px;}
-.ef-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width 0.6s ease;}
+
+/* EF tracker in investments — removed */
 
 /* BUDGET PLANNER TAB */
 .budget-hero{background:linear-gradient(135deg,rgba(42,138,127,0.08),rgba(212,115,10,0.05));border:1px solid rgba(42,138,127,0.2);border-radius:var(--radius);padding:24px 20px;margin-bottom:20px;text-align:center;}
@@ -313,19 +307,38 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .alert-warn{background:rgba(212,115,10,0.12);color:var(--gold);border:1px solid rgba(212,115,10,0.3);}
 .alert-danger{background:rgba(192,57,43,0.12);color:var(--red);border:1px solid rgba(192,57,43,0.3);}
 .alert-ok{background:rgba(30,138,94,0.12);color:var(--green);border:1px solid rgba(30,138,94,0.3);}
-.emergency-fund-card{background:linear-gradient(135deg,rgba(212,115,10,0.06),rgba(192,82,126,0.04));border:1px solid rgba(212,115,10,0.25);border-radius:var(--radius);padding:22px;margin-bottom:20px;text-align:center;}
-.ef-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);margin-bottom:6px;}
-.ef-subtitle{font-size:12px;color:var(--muted);margin-bottom:16px;}
-.ef-amount{font-family:'DM Mono',monospace;font-size:clamp(28px,7vw,42px);font-weight:500;color:var(--gold);}
-.ef-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;}
-.ef-item{text-align:center;}
-.ef-item-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
-.ef-item-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;}
-.email-note{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:12px;text-align:left;}
+
+/* ef card removed */
+
 
 /* Pie chart grid */
 #budget-pie-section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
 @media(max-width:560px){#budget-pie-section{grid-template-columns:1fr;}}
+
+/* HISTORY TAB */
+.hist-hero{background:linear-gradient(135deg,rgba(42,127,168,0.07),rgba(124,92,191,0.06));border:1px solid rgba(42,127,168,0.2);border-radius:var(--radius);padding:22px 20px;margin-bottom:16px;display:flex;align-items:center;flex-wrap:wrap;gap:14px;}
+.hist-hero-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--sri);flex:1;min-width:160px;}
+.hist-hero-sub{font-size:12px;color:var(--muted);width:100%;margin-top:-10px;}
+.btn-save-snapshot{padding:10px 18px;background:linear-gradient(135deg,var(--sri),var(--invest));color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:42px;touch-action:manipulation;white-space:nowrap;}
+.btn-save-snapshot:active{opacity:0.85;}
+/* Month accordion cards */
+.hist-month-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.hist-month-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;gap:12px;user-select:none;-webkit-user-select:none;}
+.hist-month-header:active{background:var(--surface2);}
+.hist-month-label{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);}
+.hist-month-totals{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.hist-month-total{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;}
+.hist-month-arrow{color:var(--muted);font-size:14px;transition:transform 0.25s;flex-shrink:0;}
+.hist-month-body{display:none;padding:0 18px 16px;border-top:1px solid var(--border);}
+.hist-month-body.open{display:block;}
+.hist-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:14px;}
+.hist-cat-chip{background:var(--surface2);border-radius:8px;padding:10px 12px;}
+.hist-cat-name{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:3px;}
+.hist-cat-amt{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--text);}
+/* Trend summary chips */
+.hist-sum-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.hist-sum-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:5px;}
+.hist-sum-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;}
 
 /* LOADING */
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;padding:20px;}
@@ -370,6 +383,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <button class="tab-btn" onclick="switchTab('dashboard')">📊 Dashboard</button>
     <button class="tab-btn" onclick="switchTab('investments')">📈 Investments</button>
     <button class="tab-btn" onclick="switchTab('budget')">🎯 Budget</button>
+    <button class="tab-btn" onclick="switchTab('history')">🕑 History</button>
   </div>
 
   <!-- ══ MASTER TAB ══ -->
@@ -453,7 +467,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
             <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
             <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
-            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
             <option value="Other">📦 Other</option>
           </select>
         </div>
@@ -486,7 +500,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <option value="Shopping">🛍️ Shopping</option>
         <option value="EMI / Rent">🏠 EMI / Rent</option>
         <option value="Personal">👤 Personal</option>
-        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
         <option value="Savings">💰 Savings</option>
         <option value="Other">📦 Other</option>
       </select>
@@ -507,7 +521,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
             <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
             <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
-            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
             <option value="Other">📦 Other</option>
           </select>
         </div>
@@ -552,7 +566,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <option value="EMI / Rent">🏠 EMI / Rent</option>
         <option value="Savings">💰 Savings</option>
         <option value="Personal">👤 Personal</option>
-        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
         <option value="Other">📦 Other</option>
       </select>
     </div>
@@ -578,7 +592,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="Healthcare">🏥 Healthcare</option><option value="Entertainment">🎬 Entertainment</option>
             <option value="Shopping">🛍️ Shopping</option><option value="EMI / Rent">🏠 EMI / Rent</option>
             <option value="Savings">💰 Savings</option><option value="Personal">👤 Personal</option>
-            <option value="Emergency Fund">🛡️ Emergency Fund</option><option value="Other">📦 Other</option>
+
           </select>
         </div>
         <div class="form-group" style="margin-bottom:12px"><label>Should Pay</label>
@@ -642,7 +656,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             <option value="PPF">🏛️ PPF</option>
             <option value="NPS">🏦 NPS</option>
             <option value="SSY">👧 SSY</option>
-            <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
             <option value="Other">📦 Other</option>
           </select>
         </div>
@@ -651,18 +665,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="form-group"><label>Maturity Date</label><input type="date" id="inv-maturity-date" style="font-family:'DM Mono',monospace;font-size:14px;"></div>
         <div class="form-group"><label>&nbsp;</label><button class="btn-add" style="background:linear-gradient(135deg,var(--invest),var(--sri))" onclick="addInvestment()">+ Add</button></div>
       </div>
-    </div>
-
-    <!-- EF Tracker -->
-    <div class="ef-tracker-card" id="ef-tracker-card">
-      <div class="ef-tracker-title">🛡️ Emergency Fund Tracker <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--muted);margin-left:8px">Target: ₹49,000</span></div>
-      <div class="ef-stat-grid">
-        <div class="ef-stat"><div class="ef-stat-label">Deposited This Month</div><div class="ef-stat-val" id="ef-dep-month" style="color:var(--nandh)">₹0</div></div>
-        <div class="ef-stat"><div class="ef-stat-label">Total Deposited</div><div class="ef-stat-val" id="ef-dep-total" style="color:var(--invest)">₹0</div></div>
-        <div class="ef-stat"><div class="ef-stat-label">Still Needed</div><div class="ef-stat-val" id="ef-dep-rem" style="color:var(--gold)">₹49,000</div></div>
-      </div>
-      <div class="ef-prog-bg"><div class="ef-prog-fill" id="ef-prog-fill" style="width:0%"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center" id="ef-prog-label">0% of ₹49,000 target reached</div>
     </div>
 
     <!-- Summary + Filters -->
@@ -698,7 +700,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <option value="PPF">🏛️ PPF</option>
         <option value="NPS">🏦 NPS</option>
         <option value="SSY">👧 SSY</option>
-        <option value="Emergency Fund">🛡️ Emergency Fund</option>
+
         <option value="Other">📦 Other</option>
       </select>
     </div>
@@ -710,19 +712,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="panel" id="panel-budget">
     <div class="budget-hero">
       <div class="budget-hero-title">🎯 Budget Planner</div>
-      <div class="budget-hero-sub">Personal allowances, emergency fund &amp; spending limits based on your salaries</div>
-    </div>
-
-    <!-- Emergency Fund -->
-    <div class="emergency-fund-card">
-      <div class="ef-title">🛡️ Emergency Fund</div>
-      <div class="ef-subtitle">10% of combined monthly salary — always protected</div>
-      <div class="ef-amount" id="ef-amount">₹0</div>
-      <div class="ef-grid">
-        <div class="ef-item"><div class="ef-item-label">Nandhini's Share</div><div class="ef-item-val" id="ef-n" style="color:var(--nandh)">₹0</div></div>
-        <div class="ef-item"><div class="ef-item-label">Combined Salary</div><div class="ef-item-val" id="ef-combined" style="color:var(--gold)">₹0</div></div>
-        <div class="ef-item"><div class="ef-item-label">Srini's Share</div><div class="ef-item-val" id="ef-s" style="color:var(--sri)">₹0</div></div>
-      </div>
+      <div class="budget-hero-sub">Personal allowances &amp; spending limits based on your salaries</div>
     </div>
 
     <!-- Personal Allowance Cards -->
@@ -738,9 +728,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <div class="pa-pct-label"><span id="pa-pct-n">0% used</span><span>Limit: 5%</span></div>
           <div id="pa-alert-n"></div>
         </div>
-        <div class="email-note" id="email-note-n" style="display:none">
-          ⚠️ Alert at 4% → <strong>nandhinivasudevan@gmail.com</strong>
-        </div>
       </div>
       <div class="budget-person-card bp-s">
         <div class="bp-name" style="color:var(--sri)">Srinivasan</div>
@@ -752,9 +739,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <div class="pa-bar-bg"><div class="pa-bar-fill" id="pa-bar-s" style="background:var(--sri);width:0%"></div></div>
           <div class="pa-pct-label"><span id="pa-pct-s">0% used</span><span>Limit: 5%</span></div>
           <div id="pa-alert-s"></div>
-        </div>
-        <div class="email-note" id="email-note-s" style="display:none">
-          ⚠️ Alert at 4% → <strong>srinivasan.kunchithapatham@gmail.com</strong>
         </div>
       </div>
     </div>
@@ -787,6 +771,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div id="budget-breakdown"></div>
     </div>
   </div>
+
+  <!-- ══ HISTORY TAB ══ -->
+  <div class="panel" id="panel-history">
+    <div class="hist-hero">
+      <div class="hist-hero-title">🕑 Historical Spending</div>
+      <div class="hist-hero-sub">Last 12 months · Snapshots saved on the 28th of each month</div>
+      <button class="btn-save-snapshot" onclick="saveMonthlySnapshot(true)">💾 Save This Month's Snapshot</button>
+    </div>
+
+    <!-- Trend chart -->
+    <div class="card" style="padding:20px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:16px">Monthly Spend Trend</div>
+      <div style="position:relative">
+        <canvas id="hist-trend-chart" style="width:100%;height:180px;display:block"></canvas>
+        <div id="hist-trend-tooltip" style="display:none;position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.12);min-width:160px;"></div>
+      </div>
+    </div>
+
+    <!-- Summary cards row -->
+    <div id="hist-summary-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px"></div>
+
+    <!-- Month-by-month accordion -->
+    <div id="hist-months-list"></div>
+
+    <div id="hist-empty" class="empty-state" style="display:none">
+      <div class="es-icon">🕑</div>
+      <h3>No history yet</h3>
+      <p>Snapshots are saved automatically on the 28th.<br>You can also save one manually above.</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -808,21 +822,19 @@ firebase.initializeApp({
 const db = firebase.database();
 
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const CATS=['Groceries','Dining','Transport','Utilities','Healthcare','Entertainment','Shopping','EMI / Rent','Savings','Personal','Emergency Fund','Other'];
-const ICONS={'Groceries':'🛒','Dining':'🍽️','Transport':'🚗','Utilities':'💡','Healthcare':'🏥','Entertainment':'🎬','Shopping':'🛍️','EMI / Rent':'🏠','Savings':'💰','Personal':'👤','Emergency Fund':'🛡️','Other':'📦'};
+const CATS=['Groceries','Dining','Transport','Utilities','Healthcare','Entertainment','Shopping','EMI / Rent','Savings','Personal','Other'];
+const ICONS={'Groceries':'🛒','Dining':'🍽️','Transport':'🚗','Utilities':'💡','Healthcare':'🏥','Entertainment':'🎬','Shopping':'🛍️','EMI / Rent':'🏠','Savings':'💰','Personal':'👤','Other':'📦'};
 const BANKS=['State Bank','Shriram One','Hold and Grow','Standard Chartered','HDFC Bank Ltd','ICICI Bank Ltd'];
 const BANK_ICONS={'State Bank':'🏛️','Shriram One':'🏦','Hold and Grow':'💼','Standard Chartered':'🌐','HDFC Bank Ltd':'🔵','ICICI Bank Ltd':'🔴'};
-const EF_TARGET=49000;
 
-let actual={}, expected={}, salaries={N:0,S:0}, investments={};
+
+let actual={}, expected={}, salaries={N:0,S:0}, investments={}, monthlySummaries={};
 let activeMonth=new Date().getMonth(), activeYear=new Date().getFullYear();
 let masterMonth=new Date().getMonth(), masterYear=new Date().getFullYear();
 let dashMonth=new Date().getMonth(),   dashYear=new Date().getFullYear();
 let activeFilter='all', activeCatFilter='all';
 let expWhoFilter='all', expStatusFilter='all', expCatFilter='all';
 let invBankFilter='all', invTypeFilter='all';
-// Track if alerts have been sent this session (to avoid spam)
-let alertSentN=false, alertSentS=false;
 
 const fmtINR=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -876,11 +888,17 @@ db.ref('investments').on('value',snap=>{
   setSynced();
 });
 
+db.ref('monthlySummaries').on('value',snap=>{
+  monthlySummaries=snap.val()||{};
+  if(document.getElementById('panel-history').classList.contains('active')) renderHistory();
+  setSynced();
+});
+
 setTimeout(()=>document.getElementById('loadingOverlay').classList.add('hidden'),6000);
 
 // ── TABS ──
 function switchTab(tab){
-  ['master','actual','expected','dashboard','investments','budget'].forEach((t,i)=>{
+  ['master','actual','expected','dashboard','investments','budget','history'].forEach((t,i)=>{
     document.querySelectorAll('.tab-btn')[i].classList.toggle('active',t===tab);
     document.getElementById('panel-'+t).classList.toggle('active',t===tab);
   });
@@ -888,6 +906,7 @@ function switchTab(tab){
   if(tab==='master') renderMaster();
   if(tab==='investments') renderInvestments();
   if(tab==='budget') renderBudget();
+  if(tab==='history') renderHistory();
 }
 
 // ── DATES ──
@@ -1263,33 +1282,6 @@ function renderInvestments(){
   const mvLabel=document.getElementById('inv-maturity-value-label');
   if(mvLabel) mvLabel.textContent=totalMaturity>0?`Expected maturity value: ${fmtINR(totalMaturity)}`:'';
 
-  // EF Tracker — counts investments of type Emergency Fund + actual/expected with category Emergency Fund
-  const now=new Date();
-  const efFromInv=allItems.filter(e=>e.type==='Emergency Fund');
-  const efFromActual=Object.values(actual).filter(e=>e.category==='Emergency Fund');
-  const efFromExpected=Object.values(expected).filter(e=>e.category==='Emergency Fund'&&e.paid);
-
-  const efThisMonthInv=efFromInv.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>s+e.amount,0);
-  const efThisMonthAct=efFromActual.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>s+e.amount,0);
-  const efThisMonthExp=efFromExpected.filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear()).reduce((s,e)=>{
-    return s+((!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount);
-  },0);
-  const efThisMonth=efThisMonthInv+efThisMonthAct+efThisMonthExp;
-
-  const efTotalInv=efFromInv.reduce((s,e)=>s+e.amount,0);
-  const efTotalAct=efFromActual.reduce((s,e)=>s+e.amount,0);
-  const efTotalExp=efFromExpected.reduce((s,e)=>{
-    return s+((!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount);
-  },0);
-  const efTotal=efTotalInv+efTotalAct+efTotalExp;
-  const efRem=Math.max(0,EF_TARGET-efTotal);
-  const efPct=Math.min(100,Math.round((efTotal/EF_TARGET)*100));
-  document.getElementById('ef-dep-month').textContent=fmtINR(efThisMonth);
-  document.getElementById('ef-dep-total').textContent=fmtINR(efTotal);
-  document.getElementById('ef-dep-rem').textContent=fmtINR(efRem);
-  document.getElementById('ef-prog-fill').style.width=efPct+'%';
-  document.getElementById('ef-prog-label').textContent=efPct+'% of '+fmtINR(EF_TARGET)+' target reached';
-
   // Bank summary (all items unfiltered)
   const bankTotals={};
   BANKS.forEach(b=>bankTotals[b]=0);
@@ -1351,51 +1343,12 @@ function renderInvestments(){
 }
 
 // ── BUDGET PLANNER ──
-function checkAndSendAlert(who, pct){
-  const key = who==='N'?'alertSentN':'alertSentS';
-  const email = who==='N'?'nandhinivasudevan@gmail.com':'srinivasan.kunchithapatham@gmail.com';
-  const name = whoName(who);
-  // Show email note when at/above 4%
-  const noteEl = document.getElementById('email-note-'+who.toLowerCase());
-  if(pct>=4){
-    if(noteEl) noteEl.style.display='block';
-    // In a real app, a backend would send the email.
-    // Here we log it and show a one-time browser notification as a simulation.
-    if(who==='N'&&!alertSentN){
-      alertSentN=true;
-      console.log(`ALERT: ${name} has reached ${pct.toFixed(1)}% of personal allowance. Email would be sent to ${email}`);
-      showAlertToast(name, pct, email);
-    } else if(who==='S'&&!alertSentS){
-      alertSentS=true;
-      console.log(`ALERT: ${name} has reached ${pct.toFixed(1)}% of personal allowance. Email would be sent to ${email}`);
-      showAlertToast(name, pct, email);
-    }
-  } else {
-    if(noteEl) noteEl.style.display='none';
-  }
-}
-
-function showAlertToast(name, pct, email){
-  const toast=document.createElement('div');
-  toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--gold);border-radius:12px;padding:14px 20px;font-size:13px;z-index:9999;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;';
-  toast.innerHTML=`<div style="font-weight:700;color:var(--gold);margin-bottom:4px">⚠️ Personal Spend Alert</div><div style="color:var(--text)">${name} has used <strong>${pct.toFixed(1)}%</strong> of personal allowance.</div><div style="color:var(--muted);font-size:11px;margin-top:6px">Alert email → ${email}</div>`;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(), 6000);
-}
 
 function renderBudget(){
   const salN=salaries.N||0, salS=salaries.S||0;
   const combined=salN+salS;
   const now=new Date();
   const m=now.getMonth(), y=now.getFullYear();
-
-  // Emergency fund: 10% of combined
-  const ef=combined*0.10;
-  const efN=salN*0.10, efS=salS*0.10;
-  document.getElementById('ef-amount').textContent=fmtINR(ef);
-  document.getElementById('ef-n').textContent=fmtINR(efN);
-  document.getElementById('ef-s').textContent=fmtINR(efS);
-  document.getElementById('ef-combined').textContent=fmtINR(combined);
 
   // Personal allowance: 5% of each person's salary
   const allowN=salN*0.05, allowS=salS*0.05;
@@ -1404,9 +1357,6 @@ function renderBudget(){
   const remPN=allowN-spentPersonalN, remPS=allowS-spentPersonalS;
   const pctPN=allowN>0?Math.min(120,(spentPersonalN/allowN)*100):0;
   const pctPS=allowS>0?Math.min(120,(spentPersonalS/allowS)*100):0;
-  // As % of salary (for 4% alert threshold)
-  const salPctN=salN>0?(spentPersonalN/salN)*100:0;
-  const salPctS=salS>0?(spentPersonalS/salS)*100:0;
 
   document.getElementById('bp-sal-n').textContent=fmtINR(salN);
   document.getElementById('bp-sal-s').textContent=fmtINR(salS);
@@ -1437,17 +1387,12 @@ function renderBudget(){
   else if(pctPS>=80) alertS.innerHTML='<span class="alert-badge alert-warn">⚠️ Approaching limit</span>';
   else alertS.innerHTML='<span class="alert-badge alert-ok">✓ Within budget</span>';
 
-  // Email alerts check (threshold: 4% of salary)
-  checkAndSendAlert('N', salPctN);
-  checkAndSendAlert('S', salPctS);
-
   // Budget breakdown table
   const totalSpentN=computeSpent('N',m,y);
   const totalSpentS=computeSpent('S',m,y);
   const breakdown=document.getElementById('budget-breakdown');
   const rows=[
     {label:'Gross Salary',n:fmtINR(salN),s:fmtINR(salS),both:fmtINR(combined),highlight:false},
-    {label:'Emergency Fund (10%)',n:fmtINR(efN),s:fmtINR(efS),both:fmtINR(ef),highlight:true,color:'var(--gold)'},
     {label:'Personal Allowance (5%)',n:fmtINR(allowN),s:fmtINR(allowS),both:fmtINR(allowN+allowS),highlight:true,color:'var(--budget)'},
     {label:'Personal Spent (this month)',n:fmtINR(spentPersonalN),s:fmtINR(spentPersonalS),both:fmtINR(spentPersonalN+spentPersonalS),highlight:false},
     {label:'Total Spent (this month)',n:fmtINR(totalSpentN),s:fmtINR(totalSpentS),both:fmtINR(totalSpentN+totalSpentS),highlight:false},
@@ -1779,56 +1724,299 @@ function renderDashboard(){
   `;
 }
 
-// ── MONTHLY EMAIL SCHEDULER (28th at 23:00) ──
-// Since this is a pure frontend app, we can't truly send emails server-side.
-// This function fires when the app is open at the right time, logs the summary,
-// shows a prominent toast reminder, and marks in localStorage so it only fires once per month.
-function buildMonthlySummaryText(){
+// ── SAVE MONTHLY SNAPSHOT TO FIREBASE ──
+function saveMonthlySnapshot(manual=false){
   const now=new Date();
   const m=now.getMonth(), y=now.getFullYear();
+  const key=`${y}_${String(m+1).padStart(2,'0')}`; // e.g. "2025_05"
+
   const salN=salaries.N||0, salS=salaries.S||0;
   const spentN=computeSpent('N',m,y);
   const spentS=computeSpent('S',m,y);
-  const total=spentN+spentS;
+  const totalSpent=spentN+spentS;
   const combined=salN+salS;
+
+  // Category totals
   const catTotals={};
   CATS.forEach(c=>catTotals[c]=0);
-  Object.values(actual).filter(e=>e.month===m&&e.year===y).forEach(e=>{catTotals[e.category]+=e.amount;});
-  const topCats=CATS.filter(c=>catTotals[c]>0).sort((a,b)=>catTotals[b]-catTotals[a]).slice(0,5);
-  return {
-    subject:`Monthly Expense Summary — ${MONTHS[m]} ${y}`,
-    body:`Hi Nandhini & Srinivasan,\n\nHere's your ${MONTHS[m]} ${y} summary:\n\nNandhini spent: ${fmtINR(spentN)} (of ${fmtINR(salN)})\nSrinivasan spent: ${fmtINR(spentS)} (of ${fmtINR(salS)})\nCombined: ${fmtINR(total)} of ${fmtINR(combined)} budget\nRemaining: ${fmtINR(combined-total)}\n\nTop categories:\n${topCats.map(c=>`  ${ICONS[c]} ${c}: ${fmtINR(catTotals[c])}`).join('\n')}\n\nGreat work this month! 💪`,
-    to:['nandhinivasudevan@gmail.com','srinivasan.kunchithapatham@gmail.com']
+  Object.values(actual).filter(e=>e.month===m&&e.year===y).forEach(e=>{
+    catTotals[e.category]=(catTotals[e.category]||0)+e.amount;
+  });
+  Object.values(expected).filter(e=>e.month===m&&e.year===y&&e.paid).forEach(e=>{
+    const amt=(!e.sameAmount&&e.actualAmount!=null)?e.actualAmount:e.expectedAmount;
+    catTotals[e.category]=(catTotals[e.category]||0)+amt;
+  });
+
+  // Build snapshot object (strip zero-cat entries)
+  const categories={};
+  Object.entries(catTotals).filter(([,v])=>v>0).forEach(([k,v])=>categories[k]=v);
+
+  const snapshot={
+    month:m, year:y, monthName:MONTHS[m],
+    salN, salS, combined,
+    spentN, spentS, totalSpent,
+    remN:salN-spentN, remS:salS-spentS,
+    categories,
+    savedAt:Date.now(),
+    manual: manual||false
   };
+
+  setSyncing();
+  db.ref('monthlySummaries/'+key).set(snapshot).then(()=>{
+    setSynced();
+    showHistToast(`✅ ${MONTHS[m]} ${y} snapshot saved!`);
+    // Prune summaries older than 12 months
+    pruneOldSnapshots();
+  }).catch(err=>{
+    showHistToast('❌ Save failed: '+err.message);
+  });
 }
 
-function checkMonthlyEmailSchedule(){
+function pruneOldSnapshots(){
+  const cutoff=new Date();
+  cutoff.setMonth(cutoff.getMonth()-12);
+  Object.keys(monthlySummaries).forEach(key=>{
+    const [y,m]=key.split('_').map(Number);
+    const d=new Date(y,m-1,1);
+    if(d<cutoff) db.ref('monthlySummaries/'+key).remove();
+  });
+}
+
+// Auto-save on 28th (checked once on load and then every hour)
+function checkAutoSnapshot(){
   const now=new Date();
-  if(now.getDate()!==28) return;
-  if(now.getHours()<23) return;
-  const key=`monthly_email_sent_${now.getMonth()}_${now.getFullYear()}`;
-  if(localStorage.getItem(key)) return;
-  localStorage.setItem(key,'1');
-  const summary=buildMonthlySummaryText();
-  console.log('📧 MONTHLY SUMMARY EMAIL\nTo:',summary.to.join(', '),'\nSubject:',summary.subject,'\n\n',summary.body);
-  // Show a prominent in-app banner
-  const banner=document.createElement('div');
-  banner.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--surface);border:2px solid var(--gold);border-radius:14px;padding:16px 22px;font-size:13px;z-index:9999;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,0.15);';
-  banner.innerHTML=`
-    <div style="font-weight:700;color:var(--gold);font-size:15px;margin-bottom:8px">📊 Monthly Summary Ready!</div>
-    <div style="color:var(--text);margin-bottom:8px">It's the 28th — your ${MONTHS[now.getMonth()]} summary has been prepared.</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Email reminder sent to:<br>nandhinivasudevan@gmail.com<br>srinivasan.kunchithapatham@gmail.com</div>
-    <div style="display:flex;gap:8px">
-      <button onclick="switchTab('dashboard');this.closest('div[style]').remove()" style="flex:1;padding:8px;background:linear-gradient(135deg,var(--nandh),var(--sri));color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">View Dashboard</button>
-      <button onclick="this.closest('div[style]').remove()" style="padding:8px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">✕</button>
-    </div>`;
-  document.body.appendChild(banner);
-  setTimeout(()=>banner.remove(),20000);
+  if(now.getDate()<28) return;
+  const key=`${now.getFullYear()}_${String(now.getMonth()+1).padStart(2,'0')}`;
+  // Only auto-save if no snapshot exists for this month yet
+  if(!monthlySummaries[key]){
+    console.log('📸 Auto-saving monthly snapshot for',MONTHS[now.getMonth()],now.getFullYear());
+    saveMonthlySnapshot(false);
+  }
+}
+setInterval(checkAutoSnapshot,60*60*1000);
+// Check after data loads (small delay to let Firebase listeners fire)
+setTimeout(checkAutoSnapshot,4000);
+
+function showHistToast(msg){
+  const t=document.createElement('div');
+  t.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:9999;max-width:340px;width:90%;box-shadow:0 6px 24px rgba(0,0,0,0.12);text-align:center;color:var(--text)';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),4000);
 }
 
-// Check every minute
-setInterval(checkMonthlyEmailSchedule, 60000);
-checkMonthlyEmailSchedule();
-</script>
-</body>
-</html>
+// ── RENDER HISTORY TAB ──
+function renderHistory(){
+  // Sort snapshots newest first, cap at 12
+  const snapshots=Object.values(monthlySummaries)
+    .sort((a,b)=>(b.year*12+b.month)-(a.year*12+a.month))
+    .slice(0,12);
+
+  const emptyEl=document.getElementById('hist-empty');
+  const summaryCards=document.getElementById('hist-summary-cards');
+  const monthsList=document.getElementById('hist-months-list');
+
+  if(!snapshots.length){
+    emptyEl.style.display='block';
+    summaryCards.innerHTML='';
+    monthsList.innerHTML='';
+    return;
+  }
+  emptyEl.style.display='none';
+
+  // ── Summary chips (averages) ──
+  const avgTotal=snapshots.reduce((s,x)=>s+x.totalSpent,0)/snapshots.length;
+  const avgN=snapshots.reduce((s,x)=>s+x.spentN,0)/snapshots.length;
+  const avgS=snapshots.reduce((s,x)=>s+x.spentS,0)/snapshots.length;
+  const maxMonth=snapshots.reduce((a,b)=>a.totalSpent>b.totalSpent?a:b);
+  const minMonth=snapshots.reduce((a,b)=>a.totalSpent<b.totalSpent?a:b);
+  const totalAllTime=snapshots.reduce((s,x)=>s+x.totalSpent,0);
+
+  summaryCards.innerHTML=`
+    <div class="hist-sum-chip"><div class="hist-sum-label">Months Tracked</div><div class="hist-sum-val" style="color:var(--sri)">${snapshots.length}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Avg Monthly Spend</div><div class="hist-sum-val" style="color:var(--gold)">${fmtINR(Math.round(avgTotal))}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Avg Nandhini</div><div class="hist-sum-val" style="color:var(--nandh)">${fmtINR(Math.round(avgN))}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Avg Srinivasan</div><div class="hist-sum-val" style="color:var(--sri)">${fmtINR(Math.round(avgS))}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Highest Month</div><div class="hist-sum-val" style="color:var(--red)">${maxMonth.monthName.slice(0,3)} ${maxMonth.year}</div><div style="font-size:11px;color:var(--muted)">${fmtINR(maxMonth.totalSpent)}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Lowest Month</div><div class="hist-sum-val" style="color:var(--green)">${minMonth.monthName.slice(0,3)} ${minMonth.year}</div><div style="font-size:11px;color:var(--muted)">${fmtINR(minMonth.totalSpent)}</div></div>
+    <div class="hist-sum-chip"><div class="hist-sum-label">Total (All Time)</div><div class="hist-sum-val" style="color:var(--invest)">${fmtINR(totalAllTime)}</div></div>
+  `;
+
+  // ── Trend chart (oldest → newest) ──
+  drawTrendChart([...snapshots].reverse());
+
+  // ── Month accordion list ──
+  monthsList.innerHTML=snapshots.map((s,i)=>{
+    const cats=Object.entries(s.categories||{}).sort((a,b)=>b[1]-a[1]);
+    const remColor=s.remN+s.remS<0?'var(--red)':'var(--green)';
+    return `
+    <div class="hist-month-card">
+      <div class="hist-month-header" onclick="toggleHistMonth(${i})">
+        <div>
+          <div class="hist-month-label">${s.monthName} ${s.year}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${s.manual?'Manual snapshot':'Auto snapshot'}</div>
+        </div>
+        <div class="hist-month-totals">
+          <span class="hist-month-total" style="color:var(--nandh)">${fmtINR(s.spentN)}</span>
+          <span style="color:var(--muted);font-size:11px">+</span>
+          <span class="hist-month-total" style="color:var(--sri)">${fmtINR(s.spentS)}</span>
+          <span style="color:var(--muted);font-size:11px">=</span>
+          <span class="hist-month-total" style="color:var(--gold)">${fmtINR(s.totalSpent)}</span>
+        </div>
+        <span class="hist-month-arrow" id="hist-arrow-${i}">▾</span>
+      </div>
+      <div class="hist-month-body" id="hist-body-${i}">
+        <!-- Per-person summary -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;margin-bottom:4px">
+          <div style="text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px">Nandhini</div>
+            <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--nandh)">${fmtINR(s.spentN)}</div>
+            <div style="font-size:11px;color:var(--muted)">of ${fmtINR(s.salN)}</div>
+            <div style="font-size:11px;color:${s.remN<0?'var(--red)':'var(--green)'}">${s.remN<0?'Over':'Saved'} ${fmtINR(Math.abs(s.remN))}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px">Combined</div>
+            <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--gold)">${fmtINR(s.totalSpent)}</div>
+            <div style="font-size:11px;color:var(--muted)">of ${fmtINR(s.combined)}</div>
+            <div style="font-size:11px;color:${remColor}">${(s.remN+s.remS)<0?'Over':'Saved'} ${fmtINR(Math.abs(s.remN+s.remS))}</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px">Srinivasan</div>
+            <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--sri)">${fmtINR(s.spentS)}</div>
+            <div style="font-size:11px;color:var(--muted)">of ${fmtINR(s.salS)}</div>
+            <div style="font-size:11px;color:${s.remS<0?'var(--red)':'var(--green)'}">${s.remS<0?'Over':'Saved'} ${fmtINR(Math.abs(s.remS))}</div>
+          </div>
+        </div>
+        <!-- Category grid -->
+        ${cats.length?`
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-top:14px;margin-bottom:8px">By Category</div>
+        <div class="hist-cat-grid">
+          ${cats.map(([cat,amt])=>`
+            <div class="hist-cat-chip">
+              <div class="hist-cat-name">${ICONS[cat]||'📦'} ${cat}</div>
+              <div class="hist-cat-amt">${fmtINR(amt)}</div>
+            </div>`).join('')}
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleHistMonth(i){
+  const body=document.getElementById('hist-body-'+i);
+  const arrow=document.getElementById('hist-arrow-'+i);
+  if(!body) return;
+  const open=body.classList.toggle('open');
+  if(arrow) arrow.textContent=open?'▴':'▾';
+}
+
+// ── TREND CHART ──
+function drawTrendChart(snapshots){
+  const canvas=document.getElementById('hist-trend-chart');
+  const tooltip=document.getElementById('hist-trend-tooltip');
+  if(!canvas||!snapshots.length) return;
+
+  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||600;
+  const H=180;
+  canvas.width=W;
+  canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const pad={top:16,right:16,bottom:32,left:56};
+  const chartW=W-pad.left-pad.right;
+  const chartH=H-pad.top-pad.bottom;
+
+  const totals=snapshots.map(s=>s.totalSpent);
+  const ns=snapshots.map(s=>s.spentN);
+  const ss=snapshots.map(s=>s.spentS);
+  const maxVal=Math.max(...totals,1);
+  const n=snapshots.length;
+
+  const xPos=i=>pad.left+(i/(n-1||1))*chartW;
+  const yPos=v=>pad.top+chartH-(v/maxVal)*chartH;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid lines
+  ctx.strokeStyle='rgba(0,0,0,0.06)';
+  ctx.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(t=>{
+    const y=pad.top+chartH*(1-t);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+chartW,y);ctx.stroke();
+    ctx.fillStyle='#8a7968';
+    ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText(fmtINR(maxVal*t),pad.left-6,y+4);
+  });
+
+  // Draw a smooth line
+  function drawLine(data,color,fillColor){
+    ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=xPos(i),y=yPos(v);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle=color;
+    ctx.lineWidth=2.5;
+    ctx.lineJoin='round';
+    ctx.stroke();
+    // Fill under line
+    if(fillColor){
+      ctx.lineTo(xPos(data.length-1),pad.top+chartH);
+      ctx.lineTo(xPos(0),pad.top+chartH);
+      ctx.closePath();
+      ctx.fillStyle=fillColor;
+      ctx.fill();
+    }
+  }
+
+  drawLine(totals,'#d4730a','rgba(212,115,10,0.08)');
+  drawLine(ns,'#c0527e',null);
+  drawLine(ss,'#2a7fa8',null);
+
+  // Dots + month labels
+  snapshots.forEach((s,i)=>{
+    const x=xPos(i);
+    // Total dot
+    ctx.beginPath();ctx.arc(x,yPos(totals[i]),4,0,2*Math.PI);
+    ctx.fillStyle='#d4730a';ctx.fill();
+    // Month label
+    ctx.fillStyle='#8a7968';
+    ctx.font='10px DM Sans,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(s.monthName.slice(0,3),x,H-6);
+  });
+
+  // Legend
+  [['\u2014 Total','#d4730a'],['\u2014 Nandhini','#c0527e'],['\u2014 Srini','#2a7fa8']].forEach(([label,color],i)=>{
+    ctx.fillStyle=color;
+    ctx.font='bold 10px DM Sans,sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(label,pad.left+i*90,pad.top-2);
+  });
+
+  // Hover
+  canvas.onmousemove=function(e){
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*(W/rect.width);
+    // Find nearest point
+    let closest=0,minDist=Infinity;
+    snapshots.forEach((_,i)=>{
+      const d=Math.abs(mx-xPos(i));
+      if(d<minDist){minDist=d;closest=i;}
+    });
+    if(minDist>40){tooltip.style.display='none';return;}
+    const s=snapshots[closest];
+    tooltip.style.display='block';
+    tooltip.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${s.monthName} ${s.year}</div>
+      <div style="color:var(--gold)">Total: ${fmtINR(s.totalSpent)}</div>
+      <div style="color:var(--nandh)">Nandhini: ${fmtINR(s.spentN)}</div>
+      <div style="color:var(--sri)">Srinivasan: ${fmtINR(s.spentS)}</div>
+      <div style="color:var(--green);margin-top:4px;font-size:11px">Saved: ${fmtINR(s.remN+s.remS)}</div>`;
+    const cardRect=canvas.parentElement.getBoundingClientRect();
+    let tx=e.clientX-cardRect.left+10;
+    if(tx+180>cardRect.width) tx=e.clientX-cardRect.left-180;
+    tooltip.style.left=tx+'px';
+    tooltip.style.top=(e.clientY-cardRect.top-60)+'px';
+  };
+  canvas.onmouseleave=()=>{tooltip.style.display='none';};
+}
