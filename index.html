@@ -861,7 +861,7 @@ db.ref('actual').on('value',snap=>{
 
 db.ref('expected').on('value',snap=>{
   expected=snap.val()||{};
-  renderExpected(); renderMaster();
+  renderExpected(); renderActual(); renderMaster();
   if(document.getElementById('panel-dashboard').classList.contains('active')) renderDashboard();
   if(document.getElementById('panel-budget').classList.contains('active')) renderBudget();
   setSynced();
