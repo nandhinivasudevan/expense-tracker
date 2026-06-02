@@ -546,11 +546,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
     <!-- One-time migration notice — hidden after use -->
-    <div id="migration-banner" style="background:rgba(212,115,10,0.08);border:1px solid rgba(212,115,10,0.3);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <div style="font-size:13px;color:var(--gold);font-weight:600">Move May 2026 data → June 2026?</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="migrateMonthData(4,2026,5,2026)" style="padding:8px 16px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Move Data</button>
-        <button onclick="document.getElementById('migration-banner').remove()" style="padding:8px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer">Dismiss</button>
+    <div id="migration-banner" style="background:rgba(212,115,10,0.08);border:1px solid rgba(212,115,10,0.3);border-radius:10px;padding:12px 16px;margin-bottom:12px;">
+      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:8px">🔧 Data Tools</div>
+      <div id="migration-diag" style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;background:var(--surface2);border-radius:6px;padding:8px;margin-bottom:8px;white-space:pre-wrap;max-height:120px;overflow-y:auto">Click Diagnose to see what's in your database</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="diagnosDB()" style="padding:8px 14px;background:var(--sri);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">🔍 Diagnose</button>
+        <button onclick="migrateMonthData(4,2026,5,2026)" style="padding:8px 14px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">Move May→June</button>
+        <button onclick="migrateMonthData(5,2026,5,2026)" style="padding:8px 14px;background:var(--invest);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer">Re-save as June</button>
+        <button onclick="document.getElementById('migration-banner').style.display='none'" style="padding:8px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer">Hide</button>
       </div>
     </div>
     <div class="filter-row" style="flex-wrap:wrap;gap:8px 14px">
@@ -923,7 +926,40 @@ function switchTab(tab){
   if(tab==='history') renderHistory();
 }
 
-// ── ONE-TIME DATA MIGRATION ──
+// ── DB DIAGNOSTIC ──
+function diagnosDB(){
+  const el=document.getElementById('migration-diag');
+  const allActual=Object.values(actual);
+  const allExpected=Object.values(expected);
+
+  // Count by month/year
+  const actGroups={}, expGroups={};
+  allActual.forEach(e=>{
+    const k=MONTHS[e.month]+' '+e.year+' (m='+e.month+')';
+    actGroups[k]=(actGroups[k]||0)+1;
+  });
+  allExpected.forEach(e=>{
+    const k=MONTHS[e.month]+' '+e.year+' (m='+e.month+')';
+    expGroups[k]=(expGroups[k]||0)+1;
+  });
+
+  const lines=[
+    'ACTUAL expenses in DB:',
+    ...Object.entries(actGroups).map(([k,v])=>`  ${v} record(s) in ${k}`),
+    allActual.length===0?'  (none)':'',
+    '',
+    'STANDARD expenses in DB:',
+    ...Object.entries(expGroups).map(([k,v])=>`  ${v} record(s) in ${k}`),
+    allExpected.length===0?'  (none)':'',
+    '',
+    'Currently viewing:',
+    '  Expenses tab: '+MONTHS[activeMonth]+' '+activeYear+' (m='+activeMonth+')',
+    '  Standard tab: '+MONTHS[expMonth]+' '+expYear+' (m='+expMonth+')',
+  ];
+  el.textContent=lines.filter(l=>l!==undefined).join('\n');
+}
+
+
 // Moves all actual + expected records from one month to another in Firebase
 async function migrateMonthData(fromMonth, fromYear, toMonth, toYear){
   const fromName=MONTHS[fromMonth]+' '+fromYear;
