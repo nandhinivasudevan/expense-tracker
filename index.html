@@ -533,11 +533,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
     <div class="card" style="padding:16px 20px;">
-      <div class="section-title" style="margin-bottom:0;font-size:16px"><span class="dot" style="background:var(--gold)"></span>This Month at a Glance</div>
-      <div class="exp-sum-grid">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:0">
+        <div class="section-title" style="margin-bottom:0;font-size:16px"><span class="dot" style="background:var(--gold)"></span>At a Glance</div>
+        <div class="month-controls" style="margin-bottom:0">
+          <button onclick="changeExpMonth(-1)">◀</button><span id="expMonthLabel"></span><button onclick="changeExpMonth(1)">▶</button>
+        </div>
+      </div>
+      <div class="exp-sum-grid" style="margin-top:14px">
         <div class="exp-sum-item"><div class="exp-sum-label">Expected</div><div class="exp-sum-val" id="exp-total" style="color:var(--gold)">₹0</div></div>
         <div class="exp-sum-item"><div class="exp-sum-label">Paid</div><div class="exp-sum-val" id="exp-paid" style="color:var(--green)">₹0</div></div>
         <div class="exp-sum-item"><div class="exp-sum-label">Pending</div><div class="exp-sum-val" id="exp-pending" style="color:var(--red)">₹0</div></div>
+      </div>
+    </div>
+    <!-- One-time migration notice — hidden after use -->
+    <div id="migration-banner" style="background:rgba(212,115,10,0.08);border:1px solid rgba(212,115,10,0.3);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="font-size:13px;color:var(--gold);font-weight:600">Move May 2026 data → June 2026?</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="migrateMonthData(4,2026,5,2026)" style="padding:8px 16px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">Move Data</button>
+        <button onclick="document.getElementById('migration-banner').remove()" style="padding:8px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer">Dismiss</button>
       </div>
     </div>
     <div class="filter-row" style="flex-wrap:wrap;gap:8px 14px">
@@ -832,6 +845,7 @@ let actual={}, expected={}, salaries={N:0,S:0}, investments={}, monthlySummaries
 let activeMonth=new Date().getMonth(), activeYear=new Date().getFullYear();
 let masterMonth=new Date().getMonth(), masterYear=new Date().getFullYear();
 let dashMonth=new Date().getMonth(),   dashYear=new Date().getFullYear();
+let expMonth=new Date().getMonth(),    expYear=new Date().getFullYear();
 let activeFilter='all', activeCatFilter='all';
 let expWhoFilter='all', expStatusFilter='all', expCatFilter='all';
 let invBankFilter='all', invTypeFilter='all';
@@ -909,7 +923,52 @@ function switchTab(tab){
   if(tab==='history') renderHistory();
 }
 
-// ── DATES ──
+// ── ONE-TIME DATA MIGRATION ──
+// Moves all actual + expected records from one month to another in Firebase
+async function migrateMonthData(fromMonth, fromYear, toMonth, toYear){
+  const fromName=MONTHS[fromMonth]+' '+fromYear;
+  const toName=MONTHS[toMonth]+' '+toYear;
+  if(!confirm(`This will move ALL actual and standard expenses from ${fromName} to ${toName}.\n\nThis cannot be undone. Continue?`)) return;
+
+  let count=0;
+  const updates={};
+
+  // Migrate actual
+  Object.values(actual).filter(e=>e.month===fromMonth&&e.year===fromYear).forEach(e=>{
+    updates['actual/'+e.id+'/month']=toMonth;
+    updates['actual/'+e.id+'/year']=toYear;
+    count++;
+  });
+
+  // Migrate expected
+  Object.values(expected).filter(e=>e.month===fromMonth&&e.year===fromYear).forEach(e=>{
+    updates['expected/'+e.id+'/month']=toMonth;
+    updates['expected/'+e.id+'/year']=toYear;
+    count++;
+  });
+
+  if(!count){
+    alert(`No records found for ${fromName}.`);
+    return;
+  }
+
+  setSyncing();
+  try {
+    await db.ref().update(updates);
+    setSynced();
+    // Navigate both tabs to destination month
+    activeMonth=toMonth; activeYear=toYear;
+    expMonth=toMonth; expYear=toYear;
+    updateAllMonthLabels();
+    renderActual(); renderExpected();
+    document.getElementById('migration-banner')?.remove();
+    alert(`✅ Moved ${count} records from ${fromName} to ${toName}.`);
+  } catch(err){
+    alert('❌ Migration failed: '+err.message);
+  }
+}
+
+
 (function(){
   const now=new Date();
   document.getElementById('currentDate').textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
@@ -923,10 +982,12 @@ function updateAllMonthLabels(){
   document.getElementById('actualMonthLabel').textContent=MONTHS[activeMonth]+' '+activeYear;
   document.getElementById('masterMonthLabel').textContent=MONTHS[masterMonth]+' '+masterYear;
   document.getElementById('dashMonthLabel').textContent=MONTHS[dashMonth]+' '+dashYear;
+  document.getElementById('expMonthLabel').textContent=MONTHS[expMonth]+' '+expYear;
 }
 function changeMonth(d){activeMonth+=d;if(activeMonth<0){activeMonth=11;activeYear--;}if(activeMonth>11){activeMonth=0;activeYear++;}updateAllMonthLabels();renderActual();}
 function changeMasterMonth(d){masterMonth+=d;if(masterMonth<0){masterMonth=11;masterYear--;}if(masterMonth>11){masterMonth=0;masterYear++;}updateAllMonthLabels();renderMaster();}
 function changeDashMonth(d){dashMonth+=d;if(dashMonth<0){dashMonth=11;dashYear--;}if(dashMonth>11){dashMonth=0;dashYear++;}updateAllMonthLabels();renderDashboard();}
+function changeExpMonth(d){expMonth+=d;if(expMonth<0){expMonth=11;expYear--;}if(expMonth>11){expMonth=0;expYear++;}updateAllMonthLabels();renderExpected();}
 updateAllMonthLabels();
 
 function setFilter(val){
@@ -1081,7 +1142,7 @@ function addExpected(){
   const amount=parseFloat(document.getElementById('e-amount').value);
   if(!name||isNaN(amount)||amount<=0){alert('Please fill in a name and valid amount.');return;}
   const id=uid(); setSyncing();
-  db.ref('expected/'+id).set({id,name,category:document.getElementById('e-cat').value,who:document.getElementById('e-who').value,expectedAmount:amount,actualAmount:null,paid:false,sameAmount:true,month:activeMonth,year:activeYear,ts:Date.now()});
+  db.ref('expected/'+id).set({id,name,category:document.getElementById('e-cat').value,who:document.getElementById('e-who').value,expectedAmount:amount,actualAmount:null,paid:false,sameAmount:true,month:expMonth,year:expYear,ts:Date.now()});
   document.getElementById('e-name').value=''; document.getElementById('e-amount').value='';
 }
 function deleteExpected(id){setSyncing();db.ref('expected/'+id).remove();}
@@ -1107,8 +1168,7 @@ function toggleExpand(id){
 }
 
 function renderExpected(){
-  const now=new Date();
-  const allItems=Object.values(expected).filter(e=>e.month===now.getMonth()&&e.year===now.getFullYear());
+  const allItems=Object.values(expected).filter(e=>e.month===expMonth&&e.year===expYear);
   let total=0,paid=0;
   allItems.forEach(e=>{
     total+=e.expectedAmount;
